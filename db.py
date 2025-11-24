@@ -1,0 +1,149 @@
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from sqlalchemy.dialects.mysql import LONGTEXT
+import json
+
+db = SQLAlchemy()
+
+# Horários padrão para novos barbeiros
+DEFAULT_HORARIOS = [
+    "08:00", "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"
+]
+
+
+class Cliente(db.Model):
+    __tablename__ = "clientes"
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    senha = db.Column(db.String(200), nullable=False)
+
+    def to_dict(self):
+        return {"nome": self.nome, "email": self.email, "tipo": "cliente"}
+
+
+class Barber(db.Model):
+    __tablename__ = "barbers"
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    senha = db.Column(db.String(200), nullable=False)
+    foto = db.Column(db.String(400))
+    especialidades = db.Column(LONGTEXT)  # store JSON list
+    avaliacao = db.Column(db.Float, default=5.0)
+    preco_base = db.Column(db.Float, default=0.0)
+    disponibilidade = db.Column(LONGTEXT)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "email": self.email,
+            "foto": self.foto,
+            "especialidades": json.loads(self.especialidades or "[]"),
+            "avaliacao": self.avaliacao,
+            "preco_base": self.preco_base,
+            "disponibilidade": json.loads(self.disponibilidade or "[]"),
+            "tipo": "barbeiro"
+        }
+
+
+class Service(db.Model):
+    __tablename__ = "services"
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(200), nullable=False)
+    preco = db.Column(db.Float)
+    duracao = db.Column(db.Integer)
+    descricao = db.Column(db.Text)
+
+    def to_dict(self):
+        return {"id": self.id, "nome": self.nome, "preco": self.preco, "duracao": self.duracao, "descricao": self.descricao}
+
+
+class Appointment(db.Model):
+    __tablename__ = "appointments"
+    id = db.Column(db.String(50), primary_key=True)
+    cliente = db.Column(db.String(150))
+    cliente_email = db.Column(db.String(150))
+    barbeiro = db.Column(db.String(150))
+    barbeiro_id = db.Column(db.Integer)
+    servico = db.Column(db.String(200))
+    servico_id = db.Column(db.Integer)
+    date = db.Column(db.String(50))
+    time = db.Column(db.String(50))
+    status = db.Column(db.String(50))
+    total_price = db.Column(db.Float)
+    created_at = db.Column(db.String(100), default=lambda: datetime.utcnow().isoformat())
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "cliente": self.cliente,
+            "cliente_email": self.cliente_email,
+            "barbeiro": self.barbeiro,
+            "barbeiro_id": self.barbeiro_id,
+            "servico": self.servico,
+            "servico_id": self.servico_id,
+            "date": self.date,
+            "time": self.time,
+            "status": self.status,
+            "total_price": self.total_price,
+            "created_at": self.created_at,
+        }
+
+
+class Product(db.Model):
+    __tablename__ = "products"
+    id = db.Column(db.Integer, primary_key=True)
+    produto = db.Column(db.String(200))
+    quantidade = db.Column(db.Integer)
+    preco_custo = db.Column(db.Float)
+    fornecedor = db.Column(db.String(150))
+    categoria = db.Column(db.String(100))
+    descricao = db.Column(db.Text)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "produto": self.produto,
+            "quantidade": self.quantidade,
+            "preco_custo": self.preco_custo,
+            "fornecedor": self.fornecedor,
+            "categoria": self.categoria,
+            "descricao": self.descricao,
+        }
+
+
+class Notification(db.Model):
+    __tablename__ = "notifications"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(50), default='info')
+    data = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "title": self.title,
+            "message": self.message,
+            "type": self.type,
+            "data": self.data,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "is_read": self.is_read
+        }
+
+
+class Report(db.Model):
+    __tablename__ = "reports"
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    dados = db.Column(LONGTEXT)
+
+    def to_dict(self):
+        return {"id": self.id, "nome": self.nome, "dados": json.loads(self.dados or "{}")} 

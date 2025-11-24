@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Barbeiro - Corte Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/visual-improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/agenda-inteligente.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/proximos-agendamentos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-upgrade.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+<div id="dashboard-barbeiro" class="screen active">
+        <!-- Header moderno -->
+        <header class="header-modern">
+            <div class="header-brand">
+                <div class="header-brand-icon">
+                    <i class="fas fa-scissors"></i>
+                </div>
+                <span>Corte Digital</span>
+            </div>
+            <div class="header-center" style="flex: 1; text-align: center;">
+                <div style="font-size: 14px; color: var(--color-text); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-user-tie" style="color: var(--color-primary); font-size: 16px;"></i>
+                    <span>Olá, <strong id="user-name">{{ nome }}</strong></span>
+                </div>
+                <div style="font-size: 12px; color: var(--color-text-secondary);" id="current-datetime"></div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn tooltip-modern" data-tooltip="Alternar Tema" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+                <button class="header-btn tooltip-modern" data-tooltip="Sair" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Layout principal -->
+        <div class="app-layout">
+            <!-- Sidebar elegante -->
+            <aside class="app-sidebar">
+                <nav class="sidebar-nav">
+                    <div class="nav-section">
+                        <h3 class="nav-title">Menu Principal</h3>
+                        <ul class="nav-menu" style="list-style: none; padding: 0; margin: 0;">
+                            <li class="nav-item-modern active" onclick="showSection('home-barbeiro')">
+                                <div class="nav-icon-modern">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <span>Dashboard</span>
+                            </li>
+                            <li class="nav-item-modern" onclick="showSection('agenda-inteligente')">
+                                <div class="nav-icon-modern">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <span>Agenda Inteligente</span>
+                            </li>
+                            <li class="nav-item-modern" onclick="showSection('agenda-barbeiro')">
+                                <div class="nav-icon-modern">
+                                    <i class="fas fa-list"></i>
+                                </div>
+                                <span>Lista Completa</span>
+                            </li>
+                            <li class="nav-item-modern" onclick="showSection('estoque-barbeiro')">
+                                <div class="nav-icon-modern">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <span>Estoque</span>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Conteúdo principal -->
+            <main class="app-main">
+                <!-- Dashboard Home -->
+                <div id="home-barbeiro" class="content-section active">
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Bem-vindo, {{ nome }}!</h2>
+                        <p style="font-size: 14px; color: var(--color-text-secondary);">Gerencie seus agendamentos e estoque</p>
+                    </div>
+
+                    <!-- Cards de estatísticas -->
+                    <div class="stats-grid" style="margin-bottom: 32px;">
+                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.1s;">
+                            <div class="stat-icon-modern icon-gradient-blue" style="color: white;">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-content-modern">
+                                <div class="stat-number-modern" data-count="0"><span id="stat-agendamentos-hoje">0</span></div>
+                                <div class="stat-label-modern">Agendamentos Hoje</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.2s;">
+                            <div class="stat-icon-modern icon-gradient-green" style="color: white;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content-modern">
+                                <div class="stat-number-modern" data-count="0"><span id="stat-concluidos-hoje">0</span></div>
+                                <div class="stat-label-modern">Concluídos Hoje</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.3s;">
+                            <div class="stat-icon-modern icon-gradient-orange" style="color: white;">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-content-modern">
+                                <div class="stat-number-modern" data-count="0"><span id="stat-produtos">0</span></div>
+                                <div class="stat-label-modern">Produtos em Estoque</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Próximos agendamentos -->
+                    <div style="margin-top: 32px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                            <h2 class="section-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
+                                <i class="fas fa-clock"></i>
+                                Próximos Agendamentos
+                            </h2>
+                            <button onclick="showSection('agenda-inteligente')" class="view-all-btn" style="margin-top: 0;">
+                                Ver Agenda
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div id="proximos-agendamentos-barbeiro">
+                            <!-- Loading skeleton -->
+                            <div class="appointment-skeleton"></div>
+                            <div class="appointment-skeleton"></div>
+                            <div class="appointment-skeleton"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agenda Inteligente -->
+                <div id="agenda-inteligente" class="content-section">
+                    <div class="agenda-container">
+                        <!-- Stats Rápidos -->
+                        <div class="agenda-stats">
+                            <div class="agenda-stat-card">
+                                <div class="agenda-stat-icon icon-gradient-blue">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                                <div class="agenda-stat-content">
+                                    <div class="agenda-stat-value"><span id="agenda-stat-hoje">0</span></div>
+                                    <div class="agenda-stat-label">Hoje</div>
+                                </div>
+                            </div>
+                            <div class="agenda-stat-card">
+                                <div class="agenda-stat-icon icon-gradient-green">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="agenda-stat-content">
+                                    <div class="agenda-stat-value"><span id="agenda-stat-confirmados">0</span></div>
+                                    <div class="agenda-stat-label">Confirmados</div>
+                                </div>
+                            </div>
+                            <div class="agenda-stat-card">
+                                <div class="agenda-stat-icon icon-gradient-orange">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="agenda-stat-content">
+                                    <div class="agenda-stat-value"><span id="agenda-stat-pendentes">0</span></div>
+                                    <div class="agenda-stat-label">Pendentes</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Controles -->
+                        <div class="agenda-controls">
+                            <div class="agenda-nav">
+                                <button class="agenda-nav-btn" onclick="previousWeek()" title="Semana Anterior">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="agenda-current-date" id="agenda-current-week">Carregando...</div>
+                                <button class="agenda-nav-btn" onclick="nextWeek()" title="Próxima Semana">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <button class="agenda-nav-btn" onclick="goToToday()" title="Hoje">
+                                    <i class="fas fa-calendar-day"></i>
+                                </button>
+                            </div>
+
+                            <div class="agenda-filters">
+                                <button class="filter-btn active" onclick="setFilter('todos')">Todos</button>
+                                <button class="filter-btn" onclick="setFilter('agendado')">Agendados</button>
+                                <button class="filter-btn" onclick="setFilter('confirmado')">Confirmados</button>
+                                <button class="filter-btn" onclick="setFilter('concluido')">Concluídos</button>
+                                <button class="filter-btn" onclick="setFilter('cancelado')">Cancelados</button>
+                            </div>
+
+                            <div class="view-toggle">
+                                <button class="view-toggle-btn active" onclick="setView('week')">
+                                    <i class="fas fa-calendar-week"></i> Semana
+                                </button>
+                                <button class="view-toggle-btn" onclick="setView('list')">
+                                    <i class="fas fa-list"></i> Lista
+                                </button>
+                                <button class="view-toggle-btn" onclick="setView('day')">
+                                    <i class="fas fa-calendar-day"></i> Hoje
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Conteúdo da Agenda -->
+                        <div id="agenda-inteligente-content">
+                            <div class="empty-state-modern">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="empty-state-title">Carregando agenda...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agendamentos -->
+                <div id="agenda-barbeiro" class="content-section">
+                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                        <div class="custom-icon icon-gradient-blue" style="width: 40px; height: 40px; font-size: 20px; color: white;">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h2 style="margin: 0;">Todos os Agendamentos</h2>
+                    </div>
+                    <div id="barber-appointments-list">
+                        <div class="empty-state-modern">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <div class="empty-state-title">Carregando agendamentos...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estoque -->
+                <div id="estoque-barbeiro" class="content-section">
+                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                        <div class="custom-icon icon-gradient-orange" style="width: 40px; height: 40px; font-size: 20px; color: white;">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <h2 style="margin: 0;">Gerenciar Estoque</h2>
+                    </div>
+
+                    <!-- Formulário de novo produto -->
+                    <div class="elegant-card" style="margin-bottom: 24px; padding: 24px;">
+                        <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 20px;">Adicionar Novo Produto</h3>
+                        <form id="product-form" onsubmit="(async function(e){ e.preventDefault(); const name=document.getElementById('prod-name').value; const qty=document.getElementById('prod-qty').value; const price=document.getElementById('prod-price').value; await createProduct({name, quantity: Number(qty), price: Number(price)}); e.target.reset(); })(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nome do Produto</label>
+                                    <input id="prod-name" type="text" class="form-control" placeholder="Ex: Shampoo Profissional" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Quantidade</label>
+                                    <input id="prod-qty" type="number" min="0" class="form-control" placeholder="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Preço de Custo</label>
+                                    <input id="prod-price" type="number" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn--primary btn-modern">
+                                <i class="fas fa-plus"></i> Adicionar Produto
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de produtos -->
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 16px;">Produtos Cadastrados</h3>
+                        <div id="products-list">
+                            <div class="empty-state-modern">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <div class="empty-state-title">Carregando produtos...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/micro-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <script>
+        // Variável para controlar se a agenda já foi inicializada
+        let agendaInicializada = false;
+        
+        // Função para mostrar seções
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item-modern').forEach(i => i.classList.remove('active'));
+            event.target.closest('.nav-item-modern')?.classList.add('active');
+            
+            // Inicializar agenda inteligente quando abrir (apenas uma vez)
+            if (sectionId === 'agenda-inteligente' && typeof initAgendaInteligente === 'function') {
+                if (!agendaInicializada) {
+                    console.log('🔄 Inicializando agenda inteligente...');
+                    initAgendaInteligente();
+                    agendaInicializada = true;
+                } else {
+                    console.log('🔄 Recarregando agenda inteligente...');
+                    loadAgendaAppointments().then(() => renderAgenda());
+                }
+            }
+        }
+    </script>
+</body>
+</html>

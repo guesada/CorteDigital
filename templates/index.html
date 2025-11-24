@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corte Digital - Sistema de Agendamento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/visual-improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-upgrade.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Tela de Seleção Inicial -->
+    <div id="user-selection" class="screen active">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
+            <div style="max-width: 1000px; width: 100%;">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 48px;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-700)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(33, 128, 141, 0.2);">
+                        <i class="fas fa-scissors" style="font-size: 32px; color: white;"></i>
+                    </div>
+                    <h1 style="font-size: 32px; font-weight: 700; color: var(--color-text); margin-bottom: 12px;">Corte Digital</h1>
+                    <p style="font-size: 16px; color: var(--color-text-secondary); max-width: 500px; margin: 0 auto;">Sistema de agendamento para barbearias. Escolha como deseja acessar:</p>
+                </div>
+
+                <!-- Cards de Seleção -->
+                <div class="selection-cards">
+                    <!-- Card Cliente -->
+                    <div class="user-card" onclick="selectUserType('cliente')">
+                        <div class="user-card-icon-wrapper">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Cliente</h3>
+                        <p>Agende seus cortes e gerencie seus horários com facilidade</p>
+                    </div>
+
+                    <!-- Card Barbeiro -->
+                    <div class="user-card" onclick="selectUserType('barbeiro')">
+                        <div class="user-card-icon-wrapper">
+                            <i class="fas fa-scissors"></i>
+                        </div>
+                        <h3>Barbeiro</h3>
+                        <p>Gerencie sua agenda e atendimentos profissionalmente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Cliente -->
+    <div id="login-cliente" class="screen">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
+            <div style="max-width: 420px; width: 100%;">
+                <div class="elegant-card" style="padding: 40px;">
+                    <!-- Botão Voltar -->
+                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Login Cliente</h2>
+                        <p style="font-size: 14px; color: var(--color-text-secondary);">Entre com suas credenciais</p>
+                    </div>
+
+                    <form id="login-cliente-form" onsubmit="fazerLoginCliente(event)">
+                        <div class="form-group">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="Sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
+                            Entrar
+                        </button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+                        <a href="#" onclick="showRegister('cliente'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Não tem conta? Cadastre-se</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Barbeiro -->
+    <div id="login-barbeiro" class="screen">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
+            <div style="max-width: 420px; width: 100%;">
+                <div class="elegant-card" style="padding: 40px;">
+                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Login Barbeiro</h2>
+                        <p style="font-size: 14px; color: var(--color-text-secondary);">Acesso profissional</p>
+                    </div>
+
+                    <form id="login-barbeiro-form" onsubmit="fazerLoginBarbeiro(event)">
+                        <div class="form-group">
+                            <label class="form-label">E-mail Profissional</label>
+                            <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="Sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
+                            Entrar
+                        </button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+                        <a href="#" onclick="showRegister('barbeiro'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Não tem conta? Cadastre-se</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cadastro Cliente -->
+    <div id="register-cliente" class="screen">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
+            <div style="max-width: 420px; width: 100%;">
+                <div class="elegant-card" style="padding: 40px;">
+                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Criar Conta</h2>
+                        <p style="font-size: 14px; color: var(--color-text-secondary);">Cadastre-se como cliente</p>
+                    </div>
+
+                    <form id="register-cliente-form" onsubmit="fazerCadastroCliente(event)">
+                        <div class="form-group">
+                            <label class="form-label">Nome</label>
+                            <input type="text" name="name" class="form-control" placeholder="Seu nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar Senha</label>
+                            <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
+                            Criar Conta
+                        </button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+                        <a href="#" onclick="showLogin('cliente'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Já tem conta? Faça login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cadastro Barbeiro -->
+    <div id="register-barbeiro" class="screen">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
+            <div style="max-width: 420px; width: 100%;">
+                <div class="elegant-card" style="padding: 40px;">
+                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Cadastro Profissional</h2>
+                        <p style="font-size: 14px; color: var(--color-text-secondary);">Crie sua conta de barbeiro</p>
+                    </div>
+
+                    <form id="register-barbeiro-form" onsubmit="fazerCadastroBarbeiro(event)">
+                        <div class="form-group">
+                            <label class="form-label">Nome Profissional</label>
+                            <input type="text" name="name" class="form-control" placeholder="Seu nome profissional" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">E-mail Profissional</label>
+                            <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefone</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="(11) 99999-9999" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar Senha</label>
+                            <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
+                            Criar Conta Profissional
+                        </button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
+                        <a href="#" onclick="showLogin('barbeiro'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Já tem conta? Faça login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/micro-interactions.js') }}"></script>
+</body>
+</html>
