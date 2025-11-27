@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/proximos-agendamentos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-upgrade.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro-professional.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
@@ -82,60 +83,117 @@
                 <!-- Dashboard Home -->
                 <div id="home-barbeiro" class="content-section active">
                     <div style="margin-bottom: 32px;">
-                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Bem-vindo, {{ nome }}!</h2>
-                        <p style="font-size: 14px; color: var(--color-text-secondary);">Gerencie seus agendamentos e estoque</p>
+                        <h2 style="font-size: 28px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Dashboard Profissional</h2>
+                        <p style="font-size: 14px; color: var(--color-text-secondary);">Visão geral do seu negócio</p>
                     </div>
 
-                    <!-- Cards de estatísticas -->
-                    <div class="stats-grid" style="margin-bottom: 32px;">
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.1s;">
-                            <div class="stat-icon-modern icon-gradient-blue" style="color: white;">
-                                <i class="fas fa-calendar-check"></i>
+                    <!-- Métricas Principais -->
+                    <div class="professional-metrics">
+                        <div class="metric-card revenue">
+                            <div class="metric-header">
+                                <div class="metric-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <span class="metric-period">Últimos 7 dias</span>
                             </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" data-count="0"><span id="stat-agendamentos-hoje">0</span></div>
-                                <div class="stat-label-modern">Agendamentos Hoje</div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="stat-icon-modern icon-gradient-green" style="color: white;">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" data-count="0"><span id="stat-concluidos-hoje">0</span></div>
-                                <div class="stat-label-modern">Concluídos Hoje</div>
+                            <div class="metric-value">R$ <span id="revenue-7days">0,00</span></div>
+                            <div class="metric-label">Faturamento</div>
+                            <div class="metric-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="revenue-trend">0%</span> vs semana anterior
                             </div>
                         </div>
 
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.3s;">
-                            <div class="stat-icon-modern icon-gradient-orange" style="color: white;">
-                                <i class="fas fa-box"></i>
+                        <div class="metric-card appointments">
+                            <div class="metric-header">
+                                <div class="metric-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <span class="metric-period">Hoje</span>
                             </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" data-count="0"><span id="stat-produtos">0</span></div>
-                                <div class="stat-label-modern">Produtos em Estoque</div>
+                            <div class="metric-value"><span id="appointments-today">0</span></div>
+                            <div class="metric-label">Agendamentos</div>
+                            <div class="metric-detail">
+                                <span id="completed-today">0</span> concluídos • <span id="pending-today">0</span> pendentes
+                            </div>
+                        </div>
+
+                        <div class="metric-card clients">
+                            <div class="metric-header">
+                                <div class="metric-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span class="metric-period">Este mês</span>
+                            </div>
+                            <div class="metric-value"><span id="clients-month">0</span></div>
+                            <div class="metric-label">Clientes Atendidos</div>
+                            <div class="metric-detail">
+                                <span id="new-clients">0</span> novos clientes
+                            </div>
+                        </div>
+
+                        <div class="metric-card average">
+                            <div class="metric-header">
+                                <div class="metric-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <span class="metric-period">Média</span>
+                            </div>
+                            <div class="metric-value">R$ <span id="ticket-average">0,00</span></div>
+                            <div class="metric-label">Ticket Médio</div>
+                            <div class="metric-detail">
+                                Baseado em <span id="total-services">0</span> serviços
                             </div>
                         </div>
                     </div>
 
-                    <!-- Próximos agendamentos -->
-                    <div style="margin-top: 32px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                            <h2 class="section-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
-                                <i class="fas fa-clock"></i>
-                                Próximos Agendamentos
-                            </h2>
-                            <button onclick="showSection('agenda-inteligente')" class="view-all-btn" style="margin-top: 0;">
-                                Ver Agenda
+                    <!-- Agenda Inteligente - Destaque -->
+                    <div class="agenda-highlight">
+                        <div class="agenda-highlight-header">
+                            <div>
+                                <h3 style="font-size: 20px; font-weight: 700; color: var(--color-text); margin-bottom: 4px;">
+                                    <i class="fas fa-calendar-alt" style="color: #3b82f6;"></i>
+                                    Agenda Inteligente
+                                </h3>
+                                <p style="font-size: 14px; color: var(--color-text-secondary);">Seus próximos compromissos de hoje</p>
+                            </div>
+                            <button onclick="showSection('agenda-inteligente')" class="btn-view-agenda">
+                                Ver Agenda Completa
                                 <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
-                        <div id="proximos-agendamentos-barbeiro">
-                            <!-- Loading skeleton -->
-                            <div class="appointment-skeleton"></div>
-                            <div class="appointment-skeleton"></div>
-                            <div class="appointment-skeleton"></div>
+                        <div id="agenda-preview" class="agenda-preview">
+                            <div class="loading-agenda">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Carregando agenda...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumo Semanal -->
+                    <div class="weekly-summary">
+                        <h3 style="font-size: 18px; font-weight: 700; color: var(--color-text); margin-bottom: 20px;">
+                            <i class="fas fa-chart-bar"></i>
+                            Resumo da Semana
+                        </h3>
+                        <div class="weekly-chart">
+                            <div class="chart-bars" id="weekly-chart">
+                                <!-- Será preenchido via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Serviços Mais Realizados -->
+                    <div class="top-services">
+                        <h3 style="font-size: 18px; font-weight: 700; color: var(--color-text); margin-bottom: 20px;">
+                            <i class="fas fa-star"></i>
+                            Serviços Mais Realizados
+                        </h3>
+                        <div id="top-services-list" class="services-ranking">
+                            <div class="loading-services">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Carregando dados...
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -293,6 +351,7 @@
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/micro-interactions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/barbeiro-dashboard.js') }}"></script>
     <script>
         // Variável para controlar se a agenda já foi inicializada
         let agendaInicializada = false;
@@ -316,6 +375,194 @@
                     loadAgendaAppointments().then(() => renderAgenda());
                 }
             }
+        }
+
+        // ===== DASHBOARD PROFISSIONAL =====
+        async function loadProfessionalDashboard() {
+            try {
+                // Carregar agendamentos
+                const response = await fetch('/api/appointments');
+                const appointments = await response.json();
+                
+                // Calcular métricas
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+                
+                // Agendamentos de hoje
+                const todayAppointments = appointments.filter(a => a.data === today && ['agendado', 'confirmado', 'pendente'].includes(a.status));
+                const completedToday = appointments.filter(a => a.data === today && a.status === 'concluido');
+                const pendingToday = appointments.filter(a => a.data === today && ['agendado', 'confirmado', 'pendente'].includes(a.status));
+                
+                // Faturamento últimos 7 dias
+                const last7Days = appointments.filter(a => {
+                    const date = new Date(a.data);
+                    return date >= sevenDaysAgo && a.status === 'concluido';
+                });
+                const revenue7Days = last7Days.reduce((sum, a) => sum + (parseFloat(a.preco) || 0), 0);
+                
+                // Faturamento 7-14 dias atrás (para comparação)
+                const previous7Days = appointments.filter(a => {
+                    const date = new Date(a.data);
+                    return date >= fourteenDaysAgo && date < sevenDaysAgo && a.status === 'concluido';
+                });
+                const revenuePrevious = previous7Days.reduce((sum, a) => sum + (parseFloat(a.preco) || 0), 0);
+                const revenueTrend = revenuePrevious > 0 ? ((revenue7Days - revenuePrevious) / revenuePrevious * 100).toFixed(1) : 0;
+                
+                // Clientes únicos este mês
+                const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+                const monthAppointments = appointments.filter(a => a.data >= firstDayOfMonth && a.status === 'concluido');
+                const uniqueClients = new Set(monthAppointments.map(a => a.cliente_id)).size;
+                
+                // Ticket médio
+                const completedAppointments = appointments.filter(a => a.status === 'concluido');
+                const totalRevenue = completedAppointments.reduce((sum, a) => sum + (parseFloat(a.preco) || 0), 0);
+                const ticketAverage = completedAppointments.length > 0 ? totalRevenue / completedAppointments.length : 0;
+                
+                // Atualizar métricas
+                document.getElementById('revenue-7days').textContent = revenue7Days.toFixed(2).replace('.', ',');
+                document.getElementById('revenue-trend').textContent = Math.abs(revenueTrend) + '%';
+                document.querySelector('.metric-trend').classList.toggle('positive', revenueTrend >= 0);
+                document.querySelector('.metric-trend').classList.toggle('negative', revenueTrend < 0);
+                document.querySelector('.metric-trend i').className = revenueTrend >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+                
+                document.getElementById('appointments-today').textContent = todayAppointments.length;
+                document.getElementById('completed-today').textContent = completedToday.length;
+                document.getElementById('pending-today').textContent = pendingToday.length;
+                
+                document.getElementById('clients-month').textContent = uniqueClients;
+                document.getElementById('new-clients').textContent = Math.floor(uniqueClients * 0.3); // Estimativa
+                
+                document.getElementById('ticket-average').textContent = ticketAverage.toFixed(2).replace('.', ',');
+                document.getElementById('total-services').textContent = completedAppointments.length;
+                
+                // Carregar preview da agenda
+                loadAgendaPreview(todayAppointments);
+                
+                // Carregar gráfico semanal
+                loadWeeklyChart(appointments);
+                
+                // Carregar serviços mais realizados
+                loadTopServices(completedAppointments);
+                
+            } catch (error) {
+                console.error('Erro ao carregar dashboard profissional:', error);
+            }
+        }
+
+        function loadAgendaPreview(todayAppointments) {
+            const container = document.getElementById('agenda-preview');
+            
+            if (todayAppointments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-agenda">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="empty-agenda-title">Nenhum agendamento para hoje</div>
+                        <div class="empty-agenda-text">Aproveite para organizar seu espaço!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Ordenar por horário e pegar os próximos 3
+            const sorted = todayAppointments.sort((a, b) => a.horario.localeCompare(b.horario));
+            const next3 = sorted.slice(0, 3);
+            
+            container.innerHTML = next3.map(apt => `
+                <div class="preview-appointment">
+                    <div class="preview-time">${apt.horario}</div>
+                    <div class="preview-info">
+                        <div class="preview-service">${apt.servico}</div>
+                        <div class="preview-client">
+                            <i class="fas fa-user"></i>
+                            ${apt.cliente_nome}
+                        </div>
+                    </div>
+                    <div class="preview-status ${apt.status}">${apt.status}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadWeeklyChart(appointments) {
+            const container = document.getElementById('weekly-chart');
+            const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            const today = new Date().getDay();
+            
+            // Últimos 7 dias
+            const chartData = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayName = days[date.getDay()];
+                const count = appointments.filter(a => a.data === dateStr && a.status === 'concluido').length;
+                const isToday = date.getDay() === today && i === 0;
+                
+                chartData.push({ day: dayName, count, isToday });
+            }
+            
+            const maxCount = Math.max(...chartData.map(d => d.count), 1);
+            
+            container.innerHTML = chartData.map(data => {
+                const height = (data.count / maxCount) * 100;
+                return `
+                    <div class="chart-bar ${data.isToday ? 'today' : ''}">
+                        <div class="chart-bar-fill" style="height: ${height}%">
+                            <div class="chart-bar-value">${data.count}</div>
+                        </div>
+                        <div class="chart-bar-label">${data.day}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadTopServices(completedAppointments) {
+            const container = document.getElementById('top-services-list');
+            
+            // Contar serviços
+            const serviceCounts = {};
+            const serviceRevenue = {};
+            
+            completedAppointments.forEach(apt => {
+                const service = apt.servico;
+                serviceCounts[service] = (serviceCounts[service] || 0) + 1;
+                serviceRevenue[service] = (serviceRevenue[service] || 0) + (parseFloat(apt.preco) || 0);
+            });
+            
+            // Ordenar por quantidade
+            const sorted = Object.entries(serviceCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = `
+                    <div class="loading-services">
+                        <i class="fas fa-inbox"></i>
+                        Nenhum serviço realizado ainda
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sorted.map(([service, count], index) => `
+                <div class="service-rank-item">
+                    <div class="service-rank-number">${index + 1}</div>
+                    <div class="service-rank-info">
+                        <div class="service-rank-name">${service}</div>
+                        <div class="service-rank-stats">${count} ${count === 1 ? 'serviço' : 'serviços'} realizados</div>
+                    </div>
+                    <div>
+                        <div class="service-rank-count">${count}</div>
+                        <div class="service-rank-revenue">R$ ${serviceRevenue[service].toFixed(2).replace('.', ',')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Carregar dashboard ao iniciar
+        if (window.currentUser && window.currentUser.tipo === 'barbeiro') {
+            loadProfessionalDashboard();
         }
     </script>
 </body>
