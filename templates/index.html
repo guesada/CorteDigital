@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/login-forms.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="dark-theme">
+    
     <!-- Tela de Seleção Inicial -->
     <div id="user-selection" class="screen active">
         <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
             <div style="max-width: 1000px; width: 100%;">
-                <!-- Header -->
                 <div style="text-align: center; margin-bottom: 48px;">
                     <div style="width: 64px; height: 64px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-700)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(33, 128, 141, 0.2);">
                         <i class="fas fa-scissors" style="font-size: 32px; color: white;"></i>
@@ -25,9 +25,7 @@
                     <p style="font-size: 16px; color: var(--color-text-secondary); max-width: 500px; margin: 0 auto;">Sistema de agendamento para barbearias. Escolha como deseja acessar:</p>
                 </div>
 
-                <!-- Cards de Seleção -->
                 <div class="selection-cards">
-                    <!-- Card Cliente -->
                     <div class="user-card" onclick="selectUserType('cliente')">
                         <div class="user-card-icon-wrapper">
                             <i class="fas fa-user"></i>
@@ -36,7 +34,6 @@
                         <p>Agende seus cortes e gerencie seus horários com facilidade</p>
                     </div>
 
-                    <!-- Card Barbeiro -->
                     <div class="user-card" onclick="selectUserType('barbeiro')">
                         <div class="user-card-icon-wrapper">
                             <i class="fas fa-scissors"></i>
@@ -54,37 +51,38 @@
         <div class="login-container">
             <div class="login-form-side">
                 <div class="login-card">
-                <button onclick="goBack()" class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Voltar</span>
-                </button>
-
-                <div class="login-header">
-                    <div class="login-icon">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <h2 class="login-title">Bem-vindo de volta</h2>
-                    <p class="login-subtitle">Entre com suas credenciais</p>
-                </div>
-
-                <form id="login-cliente-form" onsubmit="fazerLogin(event, 'cliente')">
-                    <div class="form-group">
-                        <label class="form-label">E-mail</label>
-                        <input type="email" name="email" class="form-control" placeholder="seu@email.com" autocomplete="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Senha</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
-                    </div>
-                    <button type="submit" class="btn-submit">
-                        Entrar
+                    <button onclick="goBack()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
                     </button>
-                </form>
 
-                <div class="login-footer">
-                    <a href="#" onclick="showRegister('cliente'); return false;" class="login-link">
-                        Não tem conta? Cadastre-se
-                    </a>
+                    <div class="login-header">
+                        <div class="login-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h2 class="login-title">Bem-vindo de volta</h2>
+                        <p class="login-subtitle">Entre com suas credenciais</p>
+                    </div>
+
+                    <form id="login-cliente-form" onsubmit="fazerLogin(event, 'cliente')">
+                        <div class="form-group">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" name="email" class="form-control" placeholder="seu@email.com" autocomplete="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            Entrar
+                        </button>
+                    </form>
+
+                    <div class="login-footer">
+                        <a href="#" onclick="showRegister('cliente'); return false;" class="login-link">
+                            Não tem conta? Cadastre-se
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,37 +93,38 @@
         <div class="login-container">
             <div class="login-form-side">
                 <div class="login-card">
-                <button onclick="goBack()" class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Voltar</span>
-                </button>
-
-                <div class="login-header">
-                    <div class="login-icon">
-                        <i class="fas fa-scissors"></i>
-                    </div>
-                    <h2 class="login-title">Acesso Profissional</h2>
-                    <p class="login-subtitle">Entre com suas credenciais</p>
-                </div>
-
-                <form id="login-barbeiro-form" onsubmit="fazerLogin(event, 'barbeiro')">
-                    <div class="form-group">
-                        <label class="form-label">E-mail Profissional</label>
-                        <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" autocomplete="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Senha</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
-                    </div>
-                    <button type="submit" class="btn-submit">
-                        Entrar
+                    <button onclick="goBack()" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
                     </button>
-                </form>
 
-                <div class="login-footer">
-                    <a href="#" onclick="showRegister('barbeiro'); return false;" class="login-link">
-                        Não tem conta? Cadastre-se
-                    </a>
+                    <div class="login-header">
+                        <div class="login-icon">
+                            <i class="fas fa-scissors"></i>
+                        </div>
+                        <h2 class="login-title">Acesso Profissional</h2>
+                        <p class="login-subtitle">Entre com suas credenciais</p>
+                    </div>
+
+                    <form id="login-barbeiro-form" onsubmit="fazerLogin(event, 'barbeiro')">
+                        <div class="form-group">
+                            <label class="form-label">E-mail Profissional</label>
+                            <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" autocomplete="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            Entrar
+                        </button>
+                    </form>
+
+                    <div class="login-footer">
+                        <a href="#" onclick="showRegister('barbeiro'); return false;" class="login-link">
+                            Não tem conta? Cadastre-se
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -146,7 +145,7 @@
                         <p style="font-size: 14px; color: var(--color-text-secondary);">Cadastre-se como cliente</p>
                     </div>
 
-                    <form id="register-cliente-form" onsubmit="fazerCadastro(event, 'cliente')"
+                    <form id="register-cliente-form" onsubmit="fazerCadastro(event, 'cliente')">
                         <div class="form-group">
                             <label class="form-label">Nome</label>
                             <input type="text" name="name" class="form-control" placeholder="Seu nome completo" required>
@@ -195,7 +194,7 @@
                         <p style="font-size: 14px; color: var(--color-text-secondary);">Crie sua conta de barbeiro</p>
                     </div>
 
-                    <form id="register-barbeiro-form" onsubmit="fazerCadastro(event, 'barbeiro')"
+                    <form id="register-barbeiro-form" onsubmit="fazerCadastro(event, 'barbeiro')">
                         <div class="form-group">
                             <label class="form-label">Nome Profissional</label>
                             <input type="text" name="name" class="form-control" placeholder="Seu nome profissional" required>
@@ -229,7 +228,7 @@
         </div>
     </div>
 
-    <!-- Shared JS -->
+    <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/shared/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/theme.js') }}"></script>
@@ -237,5 +236,32 @@
     <script src="{{ url_for('static', filename='js/shared/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    
+    <script>
+        // Debug: Verificar se as funções estão carregadas
+        console.log('🔍 Verificando funções de navegação...');
+        console.log('selectUserType:', typeof selectUserType);
+        console.log('showScreen:', typeof showScreen);
+        console.log('goBack:', typeof goBack);
+        
+        // Garantir que as telas estão configuradas corretamente
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM carregado');
+            
+            // Verificar se as telas existem
+            const screens = ['user-selection', 'login-cliente', 'login-barbeiro', 'register-cliente', 'register-barbeiro'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                console.log(`Tela ${id}:`, el ? 'encontrada' : 'NÃO ENCONTRADA');
+            });
+            
+            // Garantir que apenas user-selection está ativa
+            document.querySelectorAll('.screen').forEach(s => {
+                if (s.id !== 'user-selection') {
+                    s.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

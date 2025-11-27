@@ -1,14 +1,41 @@
 /* ===== LOGIN FORMS - FULL SCREEN ===== */
 
+/* Screen Management */
+.screen {
+  display: none !important;
+  min-height: 100vh;
+}
+
+.screen.active {
+  display: block !important;
+}
+
+#login-barbeiro.active {
+  display: block !important;
+}
+
+#login-cliente.active {
+  display: block !important;
+}
+
 /* Form Container - Override styles.css */
 .login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: stretch;
-  background: var(--color-background);
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: stretch !important;
+  background: var(--color-background) !important;
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
+  width: 100% !important;
+}
+
+#login-barbeiro .login-container,
+#login-cliente .login-container {
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: stretch !important;
+  max-width: none !important;
   width: 100% !important;
 }
 
@@ -19,12 +46,13 @@
 
 /* Form Side - Full Width */
 .login-form-side {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background: var(--color-background);
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 40px !important;
+  background: var(--color-background) !important;
+  width: 100% !important;
 }
 
 /* Login Card */
@@ -182,29 +210,6 @@
   text-decoration: underline;
 }
 
-/* Loading State */
-.btn-submit.loading {
-  pointer-events: none;
-  opacity: 0.7;
-}
-
-.btn-submit.loading::after {
-  content: '';
-  width: 16px;
-  height: 16px;
-  margin-left: 10px;
-  border: 2px solid white;
-  border-top-color: transparent;
-  border-radius: 50%;
-  display: inline-block;
-  animation: spin 0.6s linear infinite;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .login-form-side {
@@ -241,9 +246,4 @@
   .btn-submit {
     padding: 18px;
   }
-}
-
-/* Remove particles */
-.particle {
-  display: none;
 }

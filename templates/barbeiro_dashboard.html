@@ -5,21 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Barbeiro - Corte Digital</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Shared CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/visual-improvements.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/modern-upgrade.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/notifications.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/proximos-agendamentos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/header-navbar.css') }}">
-    <!-- Barbeiro CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/agenda-inteligente.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/barbeiro-professional.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
-<div id="dashboard-barbeiro" class="screen active">
-        <!-- Header moderno -->
+    <div id="dashboard-barbeiro" class="screen active">
+        <!-- Header -->
         <header class="header-modern">
             <div class="header-brand">
                 <div class="header-brand-icon">
@@ -28,7 +26,7 @@
                 <span>Corte Digital</span>
             </div>
             <div class="header-center" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 1rem;">
-                <button class="header-nav-btn" onclick="showSection('home-barbeiro')" title="Dashboard">
+                <button class="header-nav-btn active" onclick="showSection('home-barbeiro')" title="Dashboard">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </button>
@@ -55,30 +53,28 @@
             </div>
         </header>
 
-        <!-- Layout principal sem sidebar -->
+        <!-- Layout principal -->
         <div class="app-layout" style="grid-template-columns: 1fr;">
-            <!-- Conteúdo principal -->
             <main class="app-main" style="max-width: 1400px; margin: 0 auto; width: 100%;">
+                
                 <!-- Dashboard Home -->
                 <div id="home-barbeiro" class="content-section active">
-                    <!-- Saudação -->
                     <div style="margin-bottom: 2.5rem;">
                         <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text);">
                             Olá, {{ nome }}! 👋
                         </h1>
-                        <p style="font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 0;">
+                        <p style="font-size: 1rem; color: var(--color-text-secondary);">
                             Bem-vindo ao seu painel profissional
                         </p>
                     </div>
 
-                    <!-- Título da seção -->
                     <div style="margin-bottom: 1.5rem;">
                         <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--color-text);">
                             Visão Geral do Negócio
                         </h2>
                     </div>
 
-                    <!-- Métricas Principais -->
+                    <!-- Métricas -->
                     <div class="professional-metrics">
                         <div class="metric-card revenue">
                             <div class="metric-header">
@@ -138,7 +134,7 @@
                         </div>
                     </div>
 
-                    <!-- Agenda Inteligente - Destaque -->
+                    <!-- Agenda Preview -->
                     <div class="agenda-highlight">
                         <div class="agenda-highlight-header">
                             <div>
@@ -168,13 +164,11 @@
                             Resumo da Semana
                         </h3>
                         <div class="weekly-chart">
-                            <div class="chart-bars" id="weekly-chart">
-                                <!-- Será preenchido via JS -->
-                            </div>
+                            <div class="chart-bars" id="weekly-chart"></div>
                         </div>
                     </div>
 
-                    <!-- Serviços Mais Realizados -->
+                    <!-- Top Serviços -->
                     <div class="top-services">
                         <h3 style="font-size: 18px; font-weight: 700; color: var(--color-text); margin-bottom: 20px;">
                             <i class="fas fa-star"></i>
@@ -192,7 +186,6 @@
                 <!-- Agenda Inteligente -->
                 <div id="agenda-inteligente" class="content-section">
                     <div class="agenda-container">
-                        <!-- Stats Rápidos -->
                         <div class="agenda-stats">
                             <div class="agenda-stat-card">
                                 <div class="agenda-stat-icon icon-gradient-blue">
@@ -223,7 +216,6 @@
                             </div>
                         </div>
 
-                        <!-- Controles -->
                         <div class="agenda-controls">
                             <div class="agenda-nav">
                                 <button class="agenda-nav-btn" onclick="previousWeek()" title="Semana Anterior">
@@ -259,7 +251,6 @@
                             </div>
                         </div>
 
-                        <!-- Conteúdo da Agenda -->
                         <div id="agenda-inteligente-content">
                             <div class="empty-state-modern">
                                 <div class="empty-state-icon">
@@ -267,24 +258,6 @@
                                 </div>
                                 <div class="empty-state-title">Carregando agenda...</div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agendamentos -->
-                <div id="agenda-barbeiro" class="content-section">
-                    <div class="section-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <div class="custom-icon icon-gradient-blue" style="width: 40px; height: 40px; font-size: 20px; color: white;">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <h2 style="margin: 0;">Todos os Agendamentos</h2>
-                    </div>
-                    <div id="barber-appointments-list">
-                        <div class="empty-state-modern">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-calendar-times"></i>
-                            </div>
-                            <div class="empty-state-title">Carregando agendamentos...</div>
                         </div>
                     </div>
                 </div>
@@ -298,10 +271,9 @@
                         <h2 style="margin: 0;">Gerenciar Estoque</h2>
                     </div>
 
-                    <!-- Formulário de novo produto -->
                     <div class="elegant-card" style="margin-bottom: 24px; padding: 24px;">
                         <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 20px;">Adicionar Novo Produto</h3>
-                        <form id="product-form" onsubmit="(async function(e){ e.preventDefault(); const name=document.getElementById('prod-name').value; const qty=document.getElementById('prod-qty').value; const price=document.getElementById('prod-price').value; await createProduct({name, quantity: Number(qty), price: Number(price)}); e.target.reset(); })(event)">
+                        <form id="product-form" onsubmit="handleProductSubmit(event)">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Nome do Produto</label>
@@ -322,7 +294,6 @@
                         </form>
                     </div>
 
-                    <!-- Lista de produtos -->
                     <div>
                         <h3 style="font-size: 16px; font-weight: 600; color: var(--color-text); margin-bottom: 16px;">Produtos Cadastrados</h3>
                         <div id="products-list">
@@ -335,11 +306,12 @@
                         </div>
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
 
-    <!-- Shared JS -->
+    <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/shared/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/theme.js') }}"></script>
@@ -347,33 +319,104 @@
     <script src="{{ url_for('static', filename='js/shared/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
-    <!-- Barbeiro JS -->
     <script src="{{ url_for('static', filename='js/barbeiro/barbeiro-dashboard.js') }}"></script>
-    <!-- Main Index -->
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    
     <script>
-        // Função para mostrar seções
         function showSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
             
-            // Atualizar navbar buttons
             document.querySelectorAll('.header-nav-btn').forEach(btn => btn.classList.remove('active'));
             if (event && event.target) {
                 const btn = event.target.closest('.header-nav-btn');
                 if (btn) btn.classList.add('active');
             }
             
-            // Inicializar agenda inteligente quando abrir
             if (sectionId === 'agenda-inteligente' && typeof initAgendaInteligente === 'function') {
                 initAgendaInteligente();
             }
         }
         
-        // Marcar o primeiro botão como ativo ao carregar
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('prod-name').value;
+            const qty = document.getElementById('prod-qty').value;
+            const price = document.getElementById('prod-price').value;
+            
+            try {
+                const response = await fetch('/api/inventory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        quantity: Number(qty),
+                        price: Number(price)
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    e.target.reset();
+                    if (typeof showNotificationToast === 'function') {
+                        showNotificationToast('Produto adicionado com sucesso!', 'success');
+                    }
+                    loadProducts();
+                } else {
+                    alert('Erro ao adicionar produto: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar produto');
+            }
+        }
+        
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/inventory');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const products = result.data || [];
+                    const container = document.getElementById('products-list');
+                    
+                    if (products.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state-modern">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <div class="empty-state-title">Nenhum produto cadastrado</div>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    container.innerHTML = products.map(p => `
+                        <div class="elegant-card" style="padding: 16px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--color-text);">${p.name}</div>
+                                    <div style="font-size: 14px; color: var(--color-text-secondary); margin-top: 4px;">
+                                        Quantidade: ${p.quantity} | Preço: R$ ${parseFloat(p.price).toFixed(2)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             const firstBtn = document.querySelector('.header-nav-btn');
             if (firstBtn) firstBtn.classList.add('active');
+            loadProducts();
         });
     </script>
 </body>
