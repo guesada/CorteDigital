@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/proximos-agendamentos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/header-navbar.css') }}">
     <!-- Cliente CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/dashboard-intuitiva.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/cliente-upgrade.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/dashboard-nova.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/agendamentos-tab.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/novo-agendamento.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/booking-form.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/calendar-picker.css') }}">
@@ -68,6 +68,74 @@
             <main class="app-main" style="max-width: 1400px; margin: 0 auto; width: 100%;">
                 <!-- Dashboard Home -->
                 <div id="home-cliente" class="content-section active">
+                    
+                    <!-- Hero Section -->
+                    <div class="hero-section">
+                        <div class="hero-content">
+                            <h1 class="hero-greeting">Olá, {{ nome }}! 👋</h1>
+                            <p class="hero-subtitle">Pronto para agendar seu próximo corte?</p>
+                            <button class="hero-cta" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('novo-agendamento'), 100);">
+                                <i class="fas fa-calendar-plus"></i>
+                                Agendar Novo Corte
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);">
+                            <div class="stat-header">
+                                <div class="stat-icon blue">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-total">0</div>
+                            <div class="stat-label">Agendamentos Ativos</div>
+                        </div>
+
+                        <div class="stat-card" onclick="showSection('historico-cliente')">
+                            <div class="stat-header">
+                                <div class="stat-icon green">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-concluidos">0</div>
+                            <div class="stat-label">Cortes Realizados</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon orange">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-proximo">--</div>
+                            <div class="stat-label">Próximo Agendamento</div>
+                        </div>
+                    </div>
+
+                    <!-- Próximos Agendamentos -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Próximos Agendamentos
+                            </h2>
+                            <button class="section-action" onclick="showSection('agendamentos-cliente')">
+                                Ver Todos
+                            </button>
+                        </div>
+                        <div id="proximos-agendamentos-lista">
+                            <!-- Loading skeleton -->
+                            <div class="skeleton skeleton-card"></div>
+                            <div class="skeleton skeleton-card"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- OLD DASHBOARD BACKUP -->
+                <div id="home-cliente-old" class="content-section" style="display: none;">
                     <!-- Saudação e ação principal -->
                     <div style="margin-bottom: 2.5rem;">
                         <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text);">
@@ -404,6 +472,7 @@
     <script src="{{ url_for('static', filename='js/shared/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
     <!-- Cliente JS -->
+    <script src="{{ url_for('static', filename='js/cliente/dashboard-nova.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cliente/novo-agendamento.js') }}"></script>
     <!-- Main Index -->
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
