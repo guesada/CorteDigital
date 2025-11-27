@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corte Digital - Sistema de Agendamento</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/visual-improvements.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-upgrade.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/visual-improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/modern-upgrade.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/login-forms.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -50,37 +51,40 @@
 
     <!-- Login Cliente -->
     <div id="login-cliente" class="screen">
-        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
-            <div style="max-width: 420px; width: 100%;">
-                <div class="elegant-card" style="padding: 40px;">
-                    <!-- Botão Voltar -->
-                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Voltar</span>
+        <div class="login-container">
+            <div class="login-form-side">
+                <div class="login-card">
+                <button onclick="goBack()" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Voltar</span>
+                </button>
+
+                <div class="login-header">
+                    <div class="login-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="login-title">Bem-vindo de volta</h2>
+                    <p class="login-subtitle">Entre com suas credenciais</p>
+                </div>
+
+                <form id="login-cliente-form" onsubmit="fazerLogin(event, 'cliente')">
+                    <div class="form-group">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" name="email" class="form-control" placeholder="seu@email.com" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Senha</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        Entrar
                     </button>
+                </form>
 
-                    <div style="text-align: center; margin-bottom: 32px;">
-                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Login Cliente</h2>
-                        <p style="font-size: 14px; color: var(--color-text-secondary);">Entre com suas credenciais</p>
-                    </div>
-
-                    <form id="login-cliente-form" onsubmit="fazerLoginCliente(event)">
-                        <div class="form-group">
-                            <label class="form-label">E-mail</label>
-                            <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Senha</label>
-                            <input type="password" name="password" class="form-control" placeholder="Sua senha" required>
-                        </div>
-                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
-                            Entrar
-                        </button>
-                    </form>
-
-                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
-                        <a href="#" onclick="showRegister('cliente'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Não tem conta? Cadastre-se</a>
-                    </div>
+                <div class="login-footer">
+                    <a href="#" onclick="showRegister('cliente'); return false;" class="login-link">
+                        Não tem conta? Cadastre-se
+                    </a>
                 </div>
             </div>
         </div>
@@ -88,36 +92,40 @@
 
     <!-- Login Barbeiro -->
     <div id="login-barbeiro" class="screen">
-        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
-            <div style="max-width: 420px; width: 100%;">
-                <div class="elegant-card" style="padding: 40px;">
-                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Voltar</span>
+        <div class="login-container">
+            <div class="login-form-side">
+                <div class="login-card">
+                <button onclick="goBack()" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Voltar</span>
+                </button>
+
+                <div class="login-header">
+                    <div class="login-icon">
+                        <i class="fas fa-scissors"></i>
+                    </div>
+                    <h2 class="login-title">Acesso Profissional</h2>
+                    <p class="login-subtitle">Entre com suas credenciais</p>
+                </div>
+
+                <form id="login-barbeiro-form" onsubmit="fazerLogin(event, 'barbeiro')">
+                    <div class="form-group">
+                        <label class="form-label">E-mail Profissional</label>
+                        <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Senha</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        Entrar
                     </button>
+                </form>
 
-                    <div style="text-align: center; margin-bottom: 32px;">
-                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Login Barbeiro</h2>
-                        <p style="font-size: 14px; color: var(--color-text-secondary);">Acesso profissional</p>
-                    </div>
-
-                    <form id="login-barbeiro-form" onsubmit="fazerLoginBarbeiro(event)">
-                        <div class="form-group">
-                            <label class="form-label">E-mail Profissional</label>
-                            <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Senha</label>
-                            <input type="password" name="password" class="form-control" placeholder="Sua senha" required>
-                        </div>
-                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
-                            Entrar
-                        </button>
-                    </form>
-
-                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
-                        <a href="#" onclick="showRegister('barbeiro'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Não tem conta? Cadastre-se</a>
-                    </div>
+                <div class="login-footer">
+                    <a href="#" onclick="showRegister('barbeiro'); return false;" class="login-link">
+                        Não tem conta? Cadastre-se
+                    </a>
                 </div>
             </div>
         </div>
@@ -138,7 +146,7 @@
                         <p style="font-size: 14px; color: var(--color-text-secondary);">Cadastre-se como cliente</p>
                     </div>
 
-                    <form id="register-cliente-form" onsubmit="fazerCadastroCliente(event)">
+                    <form id="register-cliente-form" onsubmit="fazerCadastro(event, 'cliente')"
                         <div class="form-group">
                             <label class="form-label">Nome</label>
                             <input type="text" name="name" class="form-control" placeholder="Seu nome completo" required>
@@ -187,7 +195,7 @@
                         <p style="font-size: 14px; color: var(--color-text-secondary);">Crie sua conta de barbeiro</p>
                     </div>
 
-                    <form id="register-barbeiro-form" onsubmit="fazerCadastroBarbeiro(event)">
+                    <form id="register-barbeiro-form" onsubmit="fazerCadastro(event, 'barbeiro')"
                         <div class="form-group">
                             <label class="form-label">Nome Profissional</label>
                             <input type="text" name="name" class="form-control" placeholder="Seu nome profissional" required>
@@ -221,7 +229,13 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/micro-interactions.js') }}"></script>
+    <!-- Shared JS -->
+    <script src="{{ url_for('static', filename='js/shared/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>
