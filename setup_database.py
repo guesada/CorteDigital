@@ -119,6 +119,20 @@ def criar_tabelas(conn):
     """)
     print("  ✓ Tabela 'notifications' criada")
     
+    # Tabela de Preços Personalizados por Barbeiro
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS barber_prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            barbeiro_id INTEGER NOT NULL,
+            servico_nome TEXT NOT NULL,
+            preco REAL NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (barbeiro_id) REFERENCES users(id),
+            UNIQUE(barbeiro_id, servico_nome)
+        )
+    """)
+    print("  ✓ Tabela 'barber_prices' criada")
+    
     conn.commit()
     print("✅ Todas as tabelas criadas com sucesso!\n")
 
@@ -153,14 +167,9 @@ def inserir_dados_demonstracao(conn):
     # 2. Serviços
     print("✂️  Inserindo serviços...")
     servicos = [
-        ("Corte Simples", "Corte de cabelo tradicional", 35.00, 30),
+        ("Corte", "Corte de cabelo masculino", 35.00, 30),
         ("Corte + Barba", "Corte de cabelo + barba completa", 55.00, 45),
         ("Barba", "Aparar e modelar barba", 25.00, 20),
-        ("Corte Degradê", "Corte degradê moderno", 45.00, 40),
-        ("Sobrancelha", "Design de sobrancelha", 15.00, 15),
-        ("Hidratação Capilar", "Tratamento de hidratação", 40.00, 30),
-        ("Platinado", "Descoloração completa", 120.00, 120),
-        ("Luzes", "Mechas e luzes", 80.00, 90),
     ]
     
     cursor.executemany("""
@@ -168,6 +177,44 @@ def inserir_dados_demonstracao(conn):
         VALUES (?, ?, ?, ?)
     """, servicos)
     print(f"  ✓ {len(servicos)} serviços inseridos")
+    
+    # 2.1. Preços Personalizados dos Barbeiros
+    print("💰 Inserindo preços dos barbeiros...")
+    
+    # Obter IDs dos barbeiros
+    cursor.execute("SELECT id, name FROM users WHERE tipo = 'barbeiro'")
+    barbeiros_ids = cursor.fetchall()
+    
+    # Preços padrão para cada barbeiro (podem ser diferentes)
+    precos_barbeiros = []
+    for barbeiro_id, barbeiro_nome in barbeiros_ids:
+        if "Miguel" in barbeiro_nome:
+            # Miguel - preços padrão
+            precos_barbeiros.extend([
+                (barbeiro_id, "Corte", 35.00),
+                (barbeiro_id, "Corte + Barba", 55.00),
+                (barbeiro_id, "Barba", 25.00),
+            ])
+        elif "João" in barbeiro_nome:
+            # João - preços um pouco mais altos
+            precos_barbeiros.extend([
+                (barbeiro_id, "Corte", 40.00),
+                (barbeiro_id, "Corte + Barba", 60.00),
+                (barbeiro_id, "Barba", 28.00),
+            ])
+        else:
+            # Pedro - preços mais baixos
+            precos_barbeiros.extend([
+                (barbeiro_id, "Corte", 30.00),
+                (barbeiro_id, "Corte + Barba", 50.00),
+                (barbeiro_id, "Barba", 22.00),
+            ])
+    
+    cursor.executemany("""
+        INSERT OR IGNORE INTO barber_prices (barbeiro_id, servico_nome, preco)
+        VALUES (?, ?, ?)
+    """, precos_barbeiros)
+    print(f"  ✓ {len(precos_barbeiros)} preços de barbeiros inseridos")
     
     # 3. Agendamentos de Demonstração
     print("📅 Inserindo agendamentos...")
