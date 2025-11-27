@@ -82,8 +82,8 @@ function renderProximosAgendamentos(appointments) {
         const aptDate = apt.data || apt.date;
         const aptTime = apt.horario || apt.time;
         const aptService = apt.servico || apt.service;
-        const aptBarber = apt.barbeiro_nome || apt.barber_name || 'Barbeiro';
-        const aptPrice = apt.preco || apt.price || 0;
+        const aptBarber = apt.barbeiro || apt.barbeiro_nome || apt.barber_name || 'Barbeiro';
+        const aptPrice = apt.total_price || apt.preco || apt.price || 0;
         
         const date = new Date(aptDate + 'T00:00:00');
         const day = date.getDate();
@@ -165,8 +165,8 @@ async function carregarAgendamentos() {
             const aptDate = apt.data || apt.date;
             const aptTime = apt.horario || apt.time;
             const aptService = apt.servico || apt.service;
-            const aptBarber = apt.barbeiro_nome || apt.barber_name || 'Barbeiro';
-            const aptPrice = apt.preco || apt.price || 0;
+            const aptBarber = apt.barbeiro || apt.barbeiro_nome || apt.barber_name || 'Barbeiro';
+            const aptPrice = apt.total_price || apt.preco || apt.price || 0;
             const aptStatus = apt.status || 'pendente';
             
             const date = new Date(aptDate + 'T00:00:00');
