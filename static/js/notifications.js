@@ -27,6 +27,10 @@ function initNotificationSound() {
   };
 }
 
+// Controle de som para evitar spam
+let lastSoundPlay = 0;
+const SOUND_COOLDOWN = 2000; // 2 segundos entre sons
+
 // Mostrar notificação visual
 function showVisualNotification(title, message, type = 'info') {
   // Criar notificação no topo da tela
@@ -50,10 +54,12 @@ function showVisualNotification(title, message, type = 'info') {
   // Animar entrada
   setTimeout(() => notification.classList.add('show'), 10);
   
-  // Tocar som
-  if (notificationSound) {
+  // Tocar som apenas se passou tempo suficiente desde o último som
+  const now = Date.now();
+  if (notificationSound && (now - lastSoundPlay) > SOUND_COOLDOWN) {
     try {
       notificationSound();
+      lastSoundPlay = now;
     } catch(e) {
       console.warn('Erro ao tocar som:', e);
     }
@@ -65,6 +71,9 @@ function showVisualNotification(title, message, type = 'info') {
     setTimeout(() => notification.remove(), 300);
   }, 10000);
 }
+
+// Armazenar IDs de notificações já mostradas
+let shownNotificationIds = new Set();
 
 // Verificar novas notificações
 async function checkNewNotifications() {
@@ -91,13 +100,26 @@ async function checkNewNotifications() {
     const data = await response.json();
     
     if (data.notifications && data.notifications.length > 0) {
-      data.notifications.forEach(notif => {
-        showVisualNotification(
-          notif.title || 'Nova Notificação',
-          notif.message || '',
-          notif.type || 'info'
-        );
+      // Filtrar apenas notificações que ainda não foram mostradas
+      const newNotifications = data.notifications.filter(notif => {
+        const notifId = notif.id || `${notif.title}-${notif.message}`;
+        if (shownNotificationIds.has(notifId)) {
+          return false;
+        }
+        shownNotificationIds.add(notifId);
+        return true;
       });
+      
+      // Mostrar apenas notificações novas
+      if (newNotifications.length > 0) {
+        newNotifications.forEach(notif => {
+          showVisualNotification(
+            notif.title || 'Nova Notificação',
+            notif.message || '',
+            notif.type || 'info'
+          );
+        });
+      }
       
       // Atualizar badge de notificações
       updateNotificationBadge(data.unreadCount || 0);

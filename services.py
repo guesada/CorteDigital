@@ -17,13 +17,24 @@ from db import db, Cliente, Barber, Service, Appointment, Product, Notification,
 
 
 def init_app(app):
-    # Configura o SQLALCHEMY_DATABASE_URI se não estiver configurado
-    # Permite usar variáveis de ambiente; há um exemplo abaixo usando os dados MySQL fornecidos.
-    default_uri = os.environ.get(
-        "DATABASE_URL",
-        "mysql+pymysql://root:uPRPSSlaUKFXRddDlKgQJXICUlOyCIly@maglev.proxy.rlwy.net:49057/railway",
-    )
-    app.config.setdefault("SQLALCHEMY_DATABASE_URI", default_uri)
+    # Configura o SQLALCHEMY_DATABASE_URI
+    # Formato: mysql+pymysql://usuario:senha@host:porta/database
+    database_url = os.environ.get("DATABASE_URL")
+    
+    if database_url:
+        # Se DATABASE_URL estiver no formato: root@localhost:3306@senha
+        # Converter para: mysql+pymysql://root:senha@localhost:3306/cortedigital
+        parts = database_url.split('@')
+        if len(parts) == 3:
+            user = parts[0]
+            host_port = parts[1]
+            password = parts[2]
+            database_url = f"mysql+pymysql://{user}:{password}@{host_port}/cortedigital"
+    else:
+        # Fallback para banco local
+        database_url = "mysql+pymysql://root:pjn%402024@localhost:3306/cortedigital"
+    
+    app.config.setdefault("SQLALCHEMY_DATABASE_URI", database_url)
     app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
     db.init_app(app)
     with app.app_context():
@@ -178,11 +189,16 @@ def delete_product(product_id: int) -> bool:
 
 
 def list_appointments_for_user() -> List[Dict[str, Any]]:
+    """Lista agendamentos do usuário logado."""
     usuario = usuario_atual()
     if not usuario:
         return []
+    
     if usuario["tipo"] == "barbeiro":
-        return [a.to_dict() for a in Appointment.query.all()]
+        # Barbeiro vê apenas seus próprios agendamentos
+        return [a.to_dict() for a in Appointment.query.filter_by(barbeiro_id=usuario["id"]).all()]
+    
+    # Cliente vê apenas seus próprios agendamentos
     return [a.to_dict() for a in Appointment.query.filter_by(cliente_email=usuario["email"]).all()]
 
 
@@ -195,25 +211,33 @@ def list_appointments_for_barber(barber_id: int, date: Optional[str] = None) -> 
 
 
 def create_appointment(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Cria um novo agendamento."""
     usuario = usuario_atual()
-    total = float(body.get("total", 0))
-    # create a deterministic id
-    count = Appointment.query.count()
-    apt_id = f"APT{count+1:05d}"
+    if not usuario:
+        raise ValueError("Usuário não autenticado")
+    
+    # Gerar ID único
+    last = Appointment.query.order_by(Appointment.id.desc()).first()
+    if last and last.id.startswith('APT'):
+        apt_id = f"APT{int(last.id[3:]) + 1:05d}"
+    else:
+        apt_id = "APT00001"
+    
     ap = Appointment(
         id=apt_id,
-        cliente=usuario["nome"],
-        cliente_email=usuario["email"],
+        cliente=usuario.get("name", "Cliente"),
+        cliente_email=usuario.get("email", ""),
         barbeiro=body["barberName"],
         barbeiro_id=int(body["barberId"]),
         servico=body["serviceName"],
         servico_id=int(body["serviceId"]),
         date=body["date"],
         time=body["time"],
-        status="pendente",
-        total_price=total,
+        status="agendado",
+        total_price=float(body.get("total", 0)),
         created_at=datetime.utcnow().isoformat(),
     )
+    
     db.session.add(ap)
     db.session.commit()
     return ap.to_dict()

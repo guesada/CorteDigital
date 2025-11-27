@@ -30,5 +30,13 @@ def handler_500(erro):
     return jsonify({"success": False, "message": str(erro)}), 500
 
 
+@app.errorhandler(Exception)
+def handler_exception(erro):
+    """Captura todos os erros não tratados."""
+    import traceback
+    traceback.print_exc()
+    return jsonify({"success": False, "message": str(erro)}), 500
+
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5001, debug=True)

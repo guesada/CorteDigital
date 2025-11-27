@@ -40,10 +40,10 @@ class CalendarPicker {
         <div class="calendar-header">
           <div class="calendar-month" id="calendar-month"></div>
           <div class="calendar-nav">
-            <button class="calendar-nav-btn" onclick="calendarInstance.previousMonth()">
+            <button class="calendar-nav-btn" id="calendar-prev-btn" type="button">
               <i class="fas fa-chevron-left"></i>
             </button>
-            <button class="calendar-nav-btn" onclick="calendarInstance.nextMonth()">
+            <button class="calendar-nav-btn" id="calendar-next-btn" type="button">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -70,6 +70,18 @@ class CalendarPicker {
         </div>
       </div>
     `;
+
+    // Adicionar event listeners aos botões
+    const prevBtn = document.getElementById('calendar-prev-btn');
+    const nextBtn = document.getElementById('calendar-next-btn');
+    
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => this.previousMonth());
+    }
+    
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => this.nextMonth());
+    }
 
     this.updateCalendar();
   }
@@ -108,7 +120,14 @@ class CalendarPicker {
       date.setHours(0, 0, 0, 0);
       
       const isToday = date.getTime() === today.getTime();
-      const isSelected = this.selectedDate && date.getTime() === this.selectedDate.getTime();
+      
+      // Normalizar selectedDate para comparação
+      let isSelected = false;
+      if (this.selectedDate) {
+        const selectedNormalized = new Date(this.selectedDate);
+        selectedNormalized.setHours(0, 0, 0, 0);
+        isSelected = date.getTime() === selectedNormalized.getTime();
+      }
       
       // Comparar apenas timestamps normalizados
       const isPast = date.getTime() < this.minDate.getTime();
@@ -122,7 +141,8 @@ class CalendarPicker {
 
       const dateStr = date.toISOString().split('T')[0];
       daysHTML += `<button class="${classes.join(' ')}" 
-                          onclick="calendarInstance.selectDate('${dateStr}')"
+                          data-date="${dateStr}"
+                          type="button"
                           ${isDisabled ? 'disabled' : ''}>
                      ${day}
                    </button>`;
@@ -136,6 +156,19 @@ class CalendarPicker {
     }
 
     daysEl.innerHTML = daysHTML;
+    
+    // Adicionar event listeners aos dias
+    const dayButtons = daysEl.querySelectorAll('button[data-date]');
+    console.log('🔘 Botões de dias encontrados:', dayButtons.length);
+    dayButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const dateStr = btn.getAttribute('data-date');
+        console.log('🖱️ Clique no dia:', dateStr);
+        this.selectDate(dateStr);
+      });
+    });
   }
 
   isDateDisabled(date) {
@@ -144,11 +177,43 @@ class CalendarPicker {
   }
 
   selectDate(dateStr) {
+    console.log('📅 selectDate chamado com:', dateStr);
     this.selectedDate = new Date(dateStr + 'T12:00:00');
     this.selectedTime = null;
-    this.updateCalendar();
+    console.log('✅ Data selecionada atualizada:', this.selectedDate);
+    
+    // Atualizar apenas as classes dos dias sem recriar o HTML
+    this.updateDayClasses();
     this.showTimeSlots();
     this.onDateSelect(dateStr);
+  }
+  
+  updateDayClasses() {
+    const daysEl = document.getElementById('calendar-days');
+    if (!daysEl) return;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const selectedNormalized = this.selectedDate ? new Date(this.selectedDate) : null;
+    if (selectedNormalized) selectedNormalized.setHours(0, 0, 0, 0);
+    
+    // Atualizar classes de todos os botões
+    const dayButtons = daysEl.querySelectorAll('button[data-date]');
+    dayButtons.forEach(btn => {
+      const dateStr = btn.getAttribute('data-date');
+      const date = new Date(dateStr + 'T00:00:00');
+      
+      const isToday = date.getTime() === today.getTime();
+      const isSelected = selectedNormalized && date.getTime() === selectedNormalized.getTime();
+      
+      // Remover classes antigas
+      btn.classList.remove('today', 'selected');
+      
+      // Adicionar classes novas
+      if (isToday) btn.classList.add('today');
+      if (isSelected) btn.classList.add('selected');
+    });
   }
 
   showTimeSlots() {
@@ -176,12 +241,22 @@ class CalendarPicker {
       if (isSelected) classes.push('selected');
 
       slotsHTML += `<button class="${classes.join(' ')}" 
-                           onclick="calendarInstance.selectTime('${time}')">
+                           data-time="${time}"
+                           type="button">
                       ${time}
                     </button>`;
     });
 
     slotsEl.innerHTML = slotsHTML;
+    
+    // Adicionar event listeners aos horários
+    const timeButtons = slotsEl.querySelectorAll('button[data-time]');
+    timeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const time = btn.getAttribute('data-time');
+        this.selectTime(time);
+      });
+    });
   }
 
   selectTime(time) {
@@ -191,11 +266,13 @@ class CalendarPicker {
   }
 
   previousMonth() {
+    console.log('⬅️ Mês anterior');
     this.currentDate.setMonth(this.currentDate.getMonth() - 1);
     this.updateCalendar();
   }
 
   nextMonth() {
+    console.log('➡️ Próximo mês');
     this.currentDate.setMonth(this.currentDate.getMonth() + 1);
     this.updateCalendar();
   }

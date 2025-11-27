@@ -1,5 +1,7 @@
-"""Rotas de páginas HTML."""
+"""Rotas de páginas HTML (landing, dashboards e logout)."""
+
 from flask import Blueprint, redirect, render_template, session, url_for
+
 from services import exigir_login
 
 pages_bp = Blueprint("pages", __name__)
@@ -7,13 +9,11 @@ pages_bp = Blueprint("pages", __name__)
 
 @pages_bp.route("/")
 def index():
-    """Página inicial."""
     return render_template("index.html")
 
 
 @pages_bp.route("/cliente")
 def cliente_dashboard():
-    """Dashboard do cliente."""
     if not exigir_login("cliente"):
         return redirect(url_for("pages.index"))
     return render_template("cliente_dashboard.html", nome=session.get("usuario_nome"))
@@ -21,7 +21,6 @@ def cliente_dashboard():
 
 @pages_bp.route("/barbeiro")
 def barbeiro_dashboard():
-    """Dashboard do barbeiro."""
     if not exigir_login("barbeiro"):
         return redirect(url_for("pages.index"))
     return render_template("barbeiro_dashboard.html", nome=session.get("usuario_nome"))
@@ -29,6 +28,5 @@ def barbeiro_dashboard():
 
 @pages_bp.route("/logout")
 def logout():
-    """Logout do usuário."""
     session.clear()
     return redirect(url_for("pages.index"))

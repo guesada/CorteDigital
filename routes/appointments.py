@@ -1,18 +1,41 @@
-"""Rotas relacionadas a agendamentos."""
-
+"""Rotas de agendamentos."""
 from flask import Blueprint, jsonify, request
-
-from services import (
-    exigir_login,
-    list_appointments_for_user,
-    create_appointment,
-    cancel_appointment_by_id,
-    update_appointment_status,
-    usuario_atual,
-)
-from services import list_appointments_for_barber
+from datetime import datetime
+from services import (exigir_login, list_appointments_for_user, create_appointment,
+                      cancel_appointment_by_id, update_appointment_status, usuario_atual,
+                      list_appointments_for_barber)
 
 appointments_bp = Blueprint("appointments", __name__, url_prefix="/api/appointments")
+
+
+def validate_datetime(date_str, time_str):
+    """Valida data e horário."""
+    try:
+        apt_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        today = datetime.now().date()
+        
+        if apt_date < today:
+            return "Não é possível agendar em datas passadas"
+        
+        if apt_date == today:
+            apt_time = datetime.strptime(time_str, "%H:%M").time()
+            if apt_time <= datetime.now().time():
+                return "Não é possível agendar em horários que já passaram"
+        
+        return None
+    except ValueError:
+        return "Data ou horário inválido"
+
+
+def notify_barber(barber_id, client_name, service_name, date_str, time_str, apt_id):
+    """Cria notificação para o barbeiro."""
+    try:
+        from routes.notifications import create_notification
+        date_formatted = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d/%m/%Y")
+        message = f"{client_name} agendou {service_name} para {date_formatted} às {time_str}"
+        create_notification(barber_id, 'Novo Agendamento', message, 'new-appointment', str(apt_id))
+    except Exception as e:
+        print(f"Erro ao criar notificação: {e}")
 
 
 @appointments_bp.route("", methods=["GET", "POST"])
@@ -23,65 +46,31 @@ def appointments_root():
     if request.method == "GET":
         return jsonify({"success": True, "data": list_appointments_for_user()})
 
+    # POST - Criar agendamento
     body = request.get_json() or {}
     required = ["barberId", "barberName", "serviceId", "serviceName", "date", "time"]
-    if not all(body.get(field) for field in required):
-        return jsonify({"success": False, "message": "Dados incompletos para agendamento"}), 400
+    if not all(body.get(f) for f in required):
+        return jsonify({"success": False, "message": "Dados incompletos"}), 400
 
-    barber_id = int(body.get("barberId"))
-    date = body.get("date")
-    time = body.get("time")
+    barber_id, date, time = int(body["barberId"]), body["date"], body["time"]
     
-    # Validar data não pode ser no passado
-    from datetime import datetime
-    try:
-        appointment_date = datetime.strptime(date, "%Y-%m-%d").date()
-        today = datetime.now().date()
-        if appointment_date < today:
-            return jsonify({"success": False, "message": "Não é possível agendar em datas passadas"}), 400
-        
-        # Se for hoje, validar horário
-        if appointment_date == today:
-            appointment_time = datetime.strptime(time, "%H:%M").time()
-            now_time = datetime.now().time()
-            if appointment_time <= now_time:
-                return jsonify({"success": False, "message": "Não é possível agendar em horários que já passaram"}), 400
-    except ValueError:
-        return jsonify({"success": False, "message": "Data ou horário inválido"}), 400
+    # Validar data/hora
+    error = validate_datetime(date, time)
+    if error:
+        return jsonify({"success": False, "message": error}), 400
 
-    # Verifica conflito: mesmo barbeiro, mesma data e hora, status diferente de 'cancelado'
-    existing = [a for a in list_appointments_for_barber(barber_id, date) if a.get("time") == time and a.get("status") != "cancelado"]
+    # Verificar conflito
+    existing = [a for a in list_appointments_for_barber(barber_id, date)
+                if a.get("time") == time and a.get("status") != "cancelado"]
     if existing:
         return jsonify({"success": False, "message": "Horário já agendado"}), 409
 
+    # Criar agendamento
     novo = create_appointment(body)
     
-    # Criar notificação para o barbeiro
-    try:
-        from routes.notifications import create_notification
-        from datetime import datetime
-        
-        # Formatar data e hora para exibição
-        date_obj = datetime.strptime(date, "%Y-%m-%d")
-        date_formatted = date_obj.strftime("%d/%m/%Y")
-        
-        # Pegar nome do cliente
-        user = usuario_atual()
-        client_name = user.get('name', 'Cliente')
-        service_name = body.get('serviceName', 'Serviço')
-        
-        notification_message = f"{client_name} agendou {service_name} para {date_formatted} às {time}"
-        
-        create_notification(
-            user_id=barber_id,
-            title='Novo Agendamento',
-            message=notification_message,
-            notification_type='new-appointment',
-            data=str(novo.get('id', ''))
-        )
-    except Exception as e:
-        print(f"Erro ao criar notificação: {e}")
-        # Não falhar a criação do agendamento se a notificação falhar
+    # Notificar barbeiro
+    user = usuario_atual()
+    notify_barber(barber_id, user.get('name', 'Cliente'), body['serviceName'], date, time, novo.get('id'))
     
     return jsonify({"success": True, "data": novo}), 201
 
@@ -90,9 +79,8 @@ def appointments_root():
 def cancel_appointment(appointment_id: str):
     if not exigir_login():
         return jsonify({"success": False, "message": "Não autenticado"}), 401
-
-    ok = cancel_appointment_by_id(appointment_id)
-    if not ok:
+    
+    if not cancel_appointment_by_id(appointment_id):
         return jsonify({"success": False, "message": "Agendamento não encontrado"}), 404
     return jsonify({"success": True})
 
@@ -100,15 +88,13 @@ def cancel_appointment(appointment_id: str):
 @appointments_bp.patch("/<appointment_id>/status")
 def update_status(appointment_id: str):
     if not exigir_login("barbeiro"):
-        return jsonify({"success": False, "message": "Apenas barbeiros podem atualizar status"}), 401
+        return jsonify({"success": False, "message": "Apenas barbeiros"}), 401
 
-    body = request.get_json() or {}
-    status = body.get("status")
+    status = (request.get_json() or {}).get("status")
     if not status:
-        return jsonify({"success": False, "message": "Status é obrigatório"}), 400
+        return jsonify({"success": False, "message": "Status obrigatório"}), 400
 
-    ok = update_appointment_status(appointment_id, status)
-    if not ok:
+    if not update_appointment_status(appointment_id, status):
         return jsonify({"success": False, "message": "Agendamento não encontrado"}), 404
     return jsonify({"success": True})
 
@@ -117,6 +103,6 @@ def update_status(appointment_id: str):
 def appointments_for_barber(barber_id: int):
     if not exigir_login():
         return jsonify({"success": False, "message": "Não autenticado"}), 401
-    date = request.args.get('date')
-    data = list_appointments_for_barber(barber_id, date)
+    
+    data = list_appointments_for_barber(barber_id, request.args.get('date'))
     return jsonify({"success": True, "data": data})

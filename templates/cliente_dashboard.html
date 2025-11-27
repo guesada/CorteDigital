@@ -15,7 +15,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-upgrade.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-picker.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cancel-modal.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/progressive-booking.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente-upgrade.css') }}">
+    <!-- Dashboard Intuitiva deve ser carregado por último para sobrescrever estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-intuitiva.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/novo-agendamento.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
 <div id="dashboard-cliente" class="screen active">
@@ -27,12 +32,19 @@
                 </div>
                 <span>Corte Digital</span>
             </div>
-            <div class="header-center" style="flex: 1; text-align: center;">
-                <div style="font-size: 14px; color: var(--color-text); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i class="fas fa-user" style="color: var(--color-primary); font-size: 16px;"></i>
-                    <span>Olá, <strong id="user-name">{{ nome }}</strong></span>
-                </div>
-                <div style="font-size: 12px; color: var(--color-text-secondary);" id="current-datetime"></div>
+            <div class="header-center" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                <button class="header-nav-btn" onclick="showSection('home-cliente')" title="Dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="header-nav-btn" onclick="showSection('agendamentos-cliente')" title="Agendamentos">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Agendamentos</span>
+                </button>
+                <button class="header-nav-btn" onclick="showSection('historico-cliente')" title="Histórico">
+                    <i class="fas fa-history"></i>
+                    <span>Histórico</span>
+                </button>
             </div>
             <div class="header-actions">
                 <button class="header-btn tooltip-modern" data-tooltip="Alternar Tema" onclick="toggleTheme()">
@@ -51,62 +63,46 @@
             </div>
         </header>
 
-        <!-- Layout principal -->
-        <div class="app-layout">
-            <!-- Sidebar elegante -->
-            <aside class="app-sidebar">
-                <nav class="sidebar-nav">
-                    <div class="nav-section">
-                        <h3 class="nav-title">Menu Principal</h3>
-                        <ul class="nav-menu" style="list-style: none; padding: 0; margin: 0;">
-                            <li class="nav-item-modern active" onclick="showSection('home-cliente')">
-                                <div class="nav-icon-modern">
-                                    <i class="fas fa-home"></i>
-                                </div>
-                                <span>Dashboard</span>
-                            </li>
-                            <li class="nav-item-modern" onclick="showSection('agendamentos-cliente')">
-                                <div class="nav-icon-modern">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <span>Agendamentos</span>
-                                <span class="badge-modern badge-info" style="margin-left: auto; display: none;" id="badge-agend">0</span>
-                            </li>
-                            <li class="nav-item-modern" onclick="showSection('historico-cliente')">
-                                <div class="nav-icon-modern">
-                                    <i class="fas fa-history"></i>
-                                </div>
-                                <span>Histórico</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="nav-section">
-                        <h3 class="nav-title">Conta</h3>
-                        <ul class="nav-menu" style="list-style: none; padding: 0; margin: 0;">
-                            <li class="nav-item-modern" onclick="showSection('perfil-cliente')">
-                                <div class="nav-icon-modern">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <span>Meu Perfil</span>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-            </aside>
-
+        <!-- Layout principal sem sidebar -->
+        <div class="app-layout" style="grid-template-columns: 1fr;">
             <!-- Conteúdo principal -->
-            <main class="app-main">
+            <main class="app-main" style="max-width: 1400px; margin: 0 auto; width: 100%;">
                 <!-- Dashboard Home -->
                 <div id="home-cliente" class="content-section active">
-                    <!-- Cards de estatísticas (carregados do banco de dados) -->
+                    <!-- Saudação e ação principal -->
+                    <div style="margin-bottom: 2.5rem;">
+                        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text);">
+                            Olá, {{ nome }}! 👋
+                        </h1>
+                        <p style="font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
+                            Pronto para agendar seu próximo corte?
+                        </p>
+                        <button class="primary-action" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('novo-agendamento'), 100);">
+                            <i class="fas fa-calendar-plus"></i>
+                            Agendar Novo Corte
+                        </button>
+                    </div>
+
+                    <!-- Cards de estatísticas -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--color-text);">
+                            Suas Estatísticas
+                        </h2>
+                        <button onclick="refreshDashboardStats()" class="btn-refresh" title="Atualizar dados">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
                     <div class="stats-grid">
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.1s;">
+                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.1s; cursor: pointer;" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);">
                             <div class="stat-icon-modern icon-gradient-blue">
                                 <i class="fas fa-calendar-check"></i>
                             </div>
                             <div class="stat-content-modern">
                                 <div class="stat-number-modern" data-count="0"><span id="stat-ativos">0</span></div>
                                 <div class="stat-label-modern">Agendamentos Ativos</div>
+                            </div>
+                            <div class="stat-card-arrow">
+                                <i class="fas fa-arrow-right"></i>
                             </div>
                         </div>
 
@@ -120,13 +116,16 @@
                             </div>
                         </div>
 
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.3s;">
+                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.3s; cursor: pointer;" onclick="showSection('historico-cliente')">
                             <div class="stat-icon-modern icon-gradient-green">
                                 <i class="fas fa-check-circle"></i>
                             </div>
                             <div class="stat-content-modern">
                                 <div class="stat-number-modern" data-count="0"><span id="stat-concluidos">0</span></div>
                                 <div class="stat-label-modern">Serviços Concluídos</div>
+                            </div>
+                            <div class="stat-card-arrow">
+                                <i class="fas fa-arrow-right"></i>
                             </div>
                         </div>
 
@@ -141,44 +140,52 @@
                         </div>
                     </div>
 
-                    <!-- Seção de ações rápidas -->
+                    <!-- Próximos agendamentos -->
+                    <div class="upcoming-section" id="upcoming-appointments-section" style="display: none;">
+                        <h2>
+                            <i class="fas fa-calendar-day"></i>
+                            Seus Próximos Agendamentos
+                        </h2>
+                        <div id="upcoming-appointments-list"></div>
+                    </div>
+
+                    <!-- Acesso rápido -->
                     <div class="quick-actions">
                         <h2 class="section-title">
-                            <i class="fas fa-bolt"></i>
-                            Ações Rápidas
+                            Acesso Rápido
                         </h2>
                         <div class="actions-grid">
-                            <button class="elegant-card btn-modern animate-fade-in-up" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('novo-agendamento'), 100);" style="animation-delay: 0.5s; display: flex; align-items: center; gap: 16px; cursor: pointer; border: none; text-align: left;">
+                            <button class="elegant-card btn-modern" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);">
                                 <div class="custom-icon icon-gradient-blue">
-                                    <i class="fas fa-plus"></i>
+                                    <i class="fas fa-list"></i>
                                 </div>
                                 <div style="flex: 1;">
-                                    <h3 style="margin: 0 0 4px 0; font-size: 16px;">Novo Agendamento</h3>
-                                    <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Agende seu próximo corte</p>
+                                    <h3>Meus Agendamentos</h3>
+                                    <p>Ver todos os agendamentos</p>
                                 </div>
-                                <i class="fas fa-arrow-right" style="color: var(--color-text-secondary);"></i>
+                                <i class="fas fa-arrow-right"></i>
                             </button>
                             
-                            <button class="elegant-card btn-modern animate-fade-in-up" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);" style="animation-delay: 0.6s; display: flex; align-items: center; gap: 16px; cursor: pointer; border: none; text-align: left;">
-                                <div class="custom-icon icon-gradient-green">
-                                    <i class="fas fa-calendar"></i>
-                                </div>
-                                <div style="flex: 1;">
-                                    <h3 style="margin: 0 0 4px 0; font-size: 16px;">Ver Agendamentos</h3>
-                                    <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Gerencie seus compromissos</p>
-                                </div>
-                                <i class="fas fa-arrow-right" style="color: var(--color-text-secondary);"></i>
-                            </button>
-                            
-                            <button class="elegant-card btn-modern animate-fade-in-up" onclick="showSection('historico-cliente')" style="animation-delay: 0.7s; display: flex; align-items: center; gap: 16px; cursor: pointer; border: none; text-align: left;">
-                                <div class="custom-icon icon-gradient-purple">
+                            <button class="elegant-card btn-modern" onclick="showSection('historico-cliente')">
+                                <div class="custom-icon icon-gradient-blue">
                                     <i class="fas fa-history"></i>
                                 </div>
                                 <div style="flex: 1;">
-                                    <h3 style="margin: 0 0 4px 0; font-size: 16px;">Histórico</h3>
-                                    <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Veja serviços anteriores</p>
+                                    <h3>Histórico</h3>
+                                    <p>Serviços anteriores</p>
                                 </div>
-                                <i class="fas fa-arrow-right" style="color: var(--color-text-secondary);"></i>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                            
+                            <button class="elegant-card btn-modern" onclick="showSection('perfil-cliente')">
+                                <div class="custom-icon icon-gradient-blue">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h3>Meu Perfil</h3>
+                                    <p>Editar informações</p>
+                                </div>
+                                <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                     </div>
@@ -197,11 +204,11 @@
                     <!-- Abas -->
                     <div class="tabs-container">
                         <div class="tabs-header">
-                            <button class="tab-btn active" onclick="switchTab('meus-agendamentos')">
+                            <button class="tab-btn active" onclick="switchTab('meus-agendamentos', event)">
                                 <i class="fas fa-list"></i>
                                 Meus Agendamentos
                             </button>
-                            <button class="tab-btn" onclick="switchTab('novo-agendamento')">
+                            <button class="tab-btn" onclick="switchTab('novo-agendamento', event)">
                                 <i class="fas fa-plus"></i>
                                 Novo Agendamento
                             </button>
@@ -218,59 +225,88 @@
 
                             <!-- Aba: Novo Agendamento -->
                             <div id="novo-agendamento" class="tab-panel">
-                                <div style="max-width: 100%; width: 100%;">
-                                    <div style="margin-bottom: 2rem;">
-                                        <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text); display: flex; align-items: center; gap: 0.75rem;">
-                                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
-                                                <i class="fas fa-calendar-plus"></i>
-                                            </div>
-                                            Novo Agendamento
-                                        </h3>
-                                        <p style="color: var(--color-text-secondary); margin-left: 60px;">Selecione o serviço, barbeiro, data e horário desejados</p>
-                                    </div>
-
-                                    <div class="elegant-card" style="margin-bottom: 2rem; padding: 2rem;">
-                                        <div class="form-row" style="gap: 2rem;">
-                                            <div class="form-group" style="flex: 1;">
-                                                <label class="form-label" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                                                    <i class="fas fa-cut" style="color: var(--color-primary);"></i>
-                                                    Serviço
-                                                </label>
-                                                <select class="form-control" id="booking-service" data-role="servico" required style="font-size: 1rem; padding: 0.875rem 1rem;">
-                                                    <option value="">Selecione um serviço</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="form-group" style="flex: 1;">
-                                                <label class="form-label" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                                                    <i class="fas fa-user-tie" style="color: var(--color-primary);"></i>
-                                                    Barbeiro
-                                                </label>
-                                                <select class="form-control" id="booking-barber" data-role="barbeiro" required style="font-size: 1rem; padding: 0.875rem 1rem;">
-                                                    <option value="">Selecione um barbeiro</option>
-                                                </select>
-                                            </div>
+                                <div class="booking-container">
+                                    <!-- Indicador de progresso -->
+                                    <div class="booking-progress">
+                                        <div class="progress-line"></div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">1</div>
+                                            <div class="progress-step-label">Serviço</div>
+                                        </div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">2</div>
+                                            <div class="progress-step-label">Barbeiro</div>
+                                        </div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">3</div>
+                                            <div class="progress-step-label">Data/Hora</div>
+                                        </div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">4</div>
+                                            <div class="progress-step-label">Confirmar</div>
                                         </div>
                                     </div>
 
-                                    <!-- Calendário Visual em Tela Cheia -->
-                                    <div id="calendar-container"></div>
-
-                                    <!-- Inputs ocultos para compatibilidade -->
-                                    <input type="hidden" data-role="data" id="selected-date">
-                                    <input type="hidden" data-role="horario" id="selected-time">
-
-                                    <div class="elegant-card" style="padding: 1.5rem; margin-top: 2rem;">
-                                        <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
-                                            <button type="button" class="btn btn--outline btn-modern" onclick="switchTab('meus-agendamentos')" style="padding: 0.875rem 2rem; font-size: 1rem;">
-                                                <i class="fas fa-times" style="margin-right: 0.5rem;"></i>
-                                                Cancelar
-                                            </button>
-                                            <button type="button" class="btn btn--primary btn-modern" id="confirm-booking-btn" onclick="confirmarAgendamentoPage()" style="padding: 0.875rem 2rem; font-size: 1rem;">
-                                                <i class="fas fa-check" style="margin-right: 0.5rem;"></i>
-                                                Confirmar Agendamento
-                                            </button>
+                                    <!-- Etapa 1: Escolher Serviço -->
+                                    <div id="booking-step-1" class="booking-step active">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Escolha o Serviço</h3>
+                                            <p class="booking-step-subtitle">Selecione o serviço que deseja agendar</p>
                                         </div>
+                                        <div class="services-grid" id="services-grid-new"></div>
+                                    </div>
+
+                                    <!-- Etapa 2: Escolher Barbeiro -->
+                                    <div id="booking-step-2" class="booking-step">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Escolha o Barbeiro</h3>
+                                            <p class="booking-step-subtitle">Selecione o profissional de sua preferência</p>
+                                        </div>
+                                        <div class="barbers-grid" id="barbers-grid-new"></div>
+                                    </div>
+
+                                    <!-- Etapa 3: Escolher Data e Horário -->
+                                    <div id="booking-step-3" class="booking-step">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Escolha Data e Horário</h3>
+                                            <p class="booking-step-subtitle">Selecione o melhor dia e horário para você</p>
+                                        </div>
+                                        <div class="calendar-container">
+                                            <div class="calendar-header">
+                                                <div class="calendar-title" id="calendar-title-new">Dezembro 2024</div>
+                                                <div class="calendar-nav">
+                                                    <button class="calendar-nav-btn" onclick="prevMonth()">
+                                                        <i class="fas fa-chevron-left"></i>
+                                                    </button>
+                                                    <button class="calendar-nav-btn" onclick="nextMonth()">
+                                                        <i class="fas fa-chevron-right"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="calendar-grid" id="calendar-grid-new"></div>
+                                            <div class="time-slots" id="time-slots-new"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Etapa 4: Confirmar -->
+                                    <div id="booking-step-4" class="booking-step">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Confirmar Agendamento</h3>
+                                            <p class="booking-step-subtitle">Revise os detalhes do seu agendamento</p>
+                                        </div>
+                                        <div class="booking-summary" id="booking-summary-new"></div>
+                                    </div>
+
+                                    <!-- Botões de navegação -->
+                                    <div class="booking-actions">
+                                        <button class="btn-booking btn-booking-back" onclick="prevBookingStep()" id="btn-booking-back">
+                                            <i class="fas fa-arrow-left"></i>
+                                            <span>Voltar</span>
+                                        </button>
+                                        <button class="btn-booking btn-booking-next" onclick="nextBookingStep()" id="btn-booking-next" disabled>
+                                            <span>Próximo</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -301,8 +337,10 @@
                     </div>
                     <div class="profile-form">
                         <div class="profile-avatar">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150" alt="Avatar">
-                            <button class="btn-edit-avatar" type="button">
+                            <div class="profile-avatar-initials">
+                                {{ nome[0] if nome else 'U' }}
+                            </div>
+                            <button class="btn-edit-avatar" type="button" title="Alterar foto">
                                 <i class="fas fa-camera"></i>
                             </button>
                         </div>
@@ -310,24 +348,46 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Nome Completo</label>
-                                    <input type="text" name="name" class="form-control" value="{{ nome }}" readonly>
+                                    <input type="text" 
+                                           name="name" 
+                                           id="profile-name"
+                                           class="form-control" 
+                                           value="{{ nome }}"
+                                           autocomplete="name">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">E-mail</label>
-                                    <input type="email" name="email" class="form-control" value="{{ session.get('usuario_email', '') }}" readonly>
+                                    <input type="email" 
+                                           name="email" 
+                                           id="profile-email"
+                                           class="form-control" 
+                                           value="{{ session.get('usuario_email', '') }}"
+                                           autocomplete="email">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Telefone</label>
-                                    <input type="tel" name="phone" class="form-control" placeholder="(11) 99999-9999">
+                                    <input type="tel" 
+                                           name="phone" 
+                                           id="profile-phone" 
+                                           class="form-control" 
+                                           placeholder="(11) 99999-9999"
+                                           autocomplete="tel">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Endereço</label>
-                                    <input type="text" name="address" class="form-control" placeholder="Rua, número, bairro">
+                                    <input type="text" 
+                                           name="address" 
+                                           id="profile-address" 
+                                           class="form-control" 
+                                           placeholder="Rua, número, bairro"
+                                           autocomplete="street-address">
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn--primary">Salvar Alterações</button>
+                            <button type="submit" class="btn btn--primary">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -338,49 +398,6 @@
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/micro-interactions.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/calendar-picker.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/cancel-modal.js') }}"></script>
-    <script>
-        // Inicializar calendário quando a aba for aberta
-        function switchTab(tabId) {
-            // Código existente de troca de aba
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-            
-            const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
-                btn.getAttribute('onclick')?.includes(tabId)
-            );
-            if (targetBtn) targetBtn.classList.add('active');
-            
-            const targetPanel = document.getElementById(tabId);
-            if (targetPanel) {
-                targetPanel.classList.add('active');
-                
-                // Inicializar calendário se for a aba de novo agendamento
-                if (tabId === 'novo-agendamento' && !window.calendarInstance) {
-                    setTimeout(() => {
-                        window.calendarInstance = initCalendar({
-                            minDate: new Date(),
-                            onDateSelect: (date) => {
-                                document.getElementById('selected-date').value = date;
-                                document.querySelector('[data-role="data"]').value = date;
-                                console.log('Data selecionada:', date);
-                            },
-                            onTimeSelect: (time) => {
-                                document.getElementById('selected-time').value = time;
-                                document.querySelector('[data-role="horario"]').value = time;
-                                console.log('Horário selecionado:', time);
-                            }
-                        });
-                    }, 100);
-                }
-                
-                // Recarregar agendamentos se necessário
-                if (tabId === 'meus-agendamentos' && typeof loadClientAppointments === 'function') {
-                    loadClientAppointments();
-                }
-            }
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/novo-agendamento.js') }}"></script>
 </body>
 </html>

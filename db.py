@@ -18,9 +18,19 @@ class Cliente(db.Model):
     nome = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
+    telefone = db.Column(db.String(20))
+    endereco = db.Column(db.String(300))
 
     def to_dict(self):
-        return {"nome": self.nome, "email": self.email, "tipo": "cliente"}
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "name": self.nome,
+            "email": self.email,
+            "telefone": self.telefone,
+            "endereco": self.endereco,
+            "tipo": "cliente"
+        }
 
 
 class Barber(db.Model):
@@ -34,17 +44,22 @@ class Barber(db.Model):
     avaliacao = db.Column(db.Float, default=5.0)
     preco_base = db.Column(db.Float, default=0.0)
     disponibilidade = db.Column(LONGTEXT)
+    telefone = db.Column(db.String(20))
+    endereco = db.Column(db.String(300))
 
     def to_dict(self):
         return {
             "id": self.id,
             "nome": self.nome,
+            "name": self.nome,
             "email": self.email,
             "foto": self.foto,
             "especialidades": json.loads(self.especialidades or "[]"),
             "avaliacao": self.avaliacao,
             "preco_base": self.preco_base,
             "disponibilidade": json.loads(self.disponibilidade or "[]"),
+            "telefone": self.telefone,
+            "endereco": self.endereco,
             "tipo": "barbeiro"
         }
 
