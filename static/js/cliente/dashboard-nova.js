@@ -236,7 +236,7 @@ async function carregarAgendamentos() {
                     
                     ${aptStatus !== 'cancelado' && aptStatus !== 'concluido' ? `
                         <div class="agendamento-actions">
-                            <button class="agendamento-btn agendamento-btn-cancel" onclick="cancelarAgendamento(${apt.id})">
+                            <button class="agendamento-btn agendamento-btn-cancel" onclick="cancelarAgendamento('${apt.id}')">
                                 <i class="fas fa-times"></i>
                                 Cancelar
                             </button>
@@ -262,7 +262,68 @@ async function carregarAgendamentos() {
 
 // Cancelar agendamento
 async function cancelarAgendamento(id) {
-    if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+    // Criar modal de confirmação
+    const modal = document.createElement('div');
+    modal.className = 'cancel-modal-overlay';
+    modal.innerHTML = `
+        <div class="cancel-modal">
+            <div class="cancel-modal-header">
+                <div class="cancel-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="cancel-modal-title">Cancelar Agendamento</h3>
+                <p class="cancel-modal-subtitle">Esta ação não pode ser desfeita</p>
+            </div>
+            
+            <div class="cancel-modal-body">
+                <label class="cancel-checkbox-container">
+                    <input type="checkbox" id="confirm-cancel-checkbox" class="cancel-checkbox-input">
+                    <span class="cancel-checkbox-custom"></span>
+                    <span class="cancel-checkbox-label">Confirmo que desejo cancelar este agendamento</span>
+                </label>
+            </div>
+            
+            <div class="cancel-modal-footer">
+                <button class="cancel-modal-btn cancel-modal-btn-secondary" onclick="fecharModalCancelamento()">
+                    <i class="fas fa-times"></i>
+                    Voltar
+                </button>
+                <button class="cancel-modal-btn cancel-modal-btn-danger" id="confirm-cancel-btn" disabled onclick="confirmarCancelamento('${id}')">
+                    <i class="fas fa-trash"></i>
+                    Cancelar Agendamento
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animar entrada
+    setTimeout(() => modal.classList.add('active'), 10);
+    
+    // Habilitar botão quando checkbox for marcado
+    const checkbox = document.getElementById('confirm-cancel-checkbox');
+    const confirmBtn = document.getElementById('confirm-cancel-btn');
+    
+    checkbox.addEventListener('change', () => {
+        confirmBtn.disabled = !checkbox.checked;
+    });
+}
+
+// Fechar modal de cancelamento
+function fecharModalCancelamento() {
+    const modal = document.querySelector('.cancel-modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+// Confirmar cancelamento
+async function confirmarCancelamento(id) {
+    const confirmBtn = document.getElementById('confirm-cancel-btn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelando...';
     
     try {
         const response = await fetch(`/api/appointments/${id}`, {
@@ -274,6 +335,7 @@ async function cancelarAgendamento(id) {
         
         if (result.success || response.ok) {
             showNotificationToast('Agendamento cancelado com sucesso!', 'success');
+            fecharModalCancelamento();
             carregarAgendamentos();
             loadClienteDashboard();
         } else {
@@ -282,6 +344,8 @@ async function cancelarAgendamento(id) {
     } catch (error) {
         console.error('❌ Erro ao cancelar:', error);
         showNotificationToast(error.message || 'Erro ao cancelar agendamento', 'error');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-trash"></i> Cancelar Agendamento';
     }
 }
 
@@ -300,3 +364,5 @@ if (document.readyState === 'loading') {
 window.loadClienteDashboard = loadClienteDashboard;
 window.carregarAgendamentos = carregarAgendamentos;
 window.cancelarAgendamento = cancelarAgendamento;
+window.fecharModalCancelamento = fecharModalCancelamento;
+window.confirmarCancelamento = confirmarCancelamento;
