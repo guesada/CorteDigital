@@ -165,130 +165,7 @@
 
                 </div>
 
-                <!-- OLD DASHBOARD BACKUP -->
-                <div id="home-cliente-old" class="content-section" style="display: none;">
-                    <!-- Saudação e ação principal -->
-                    <div style="margin-bottom: 2.5rem;">
-                        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text);">
-                            Olá, {{ nome }}! 👋
-                        </h1>
-                        <p style="font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
-                            Pronto para agendar seu próximo corte?
-                        </p>
-                        <button class="primary-action" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('novo-agendamento'), 100);">
-                            <i class="fas fa-calendar-plus"></i>
-                            Agendar Novo Corte
-                        </button>
-                    </div>
 
-                    <!-- Cards de estatísticas -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--color-text);">
-                            Suas Estatísticas
-                        </h2>
-                        <button onclick="refreshDashboardStats()" class="btn-refresh" title="Atualizar dados">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.1s; cursor: pointer;" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);">
-                            <div class="stat-icon-modern icon-gradient-blue">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" data-count="0"><span id="stat-ativos">0</span></div>
-                                <div class="stat-label-modern">Agendamentos Ativos</div>
-                            </div>
-                            <div class="stat-card-arrow">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
-                        </div>
-
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.2s;">
-                            <div class="stat-icon-modern icon-gradient-purple">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" style="font-size: 16px;"><span id="stat-proximo">--</span></div>
-                                <div class="stat-label-modern">Próximo Agendamento</div>
-                            </div>
-                        </div>
-
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.3s; cursor: pointer;" onclick="showSection('historico-cliente')">
-                            <div class="stat-icon-modern icon-gradient-green">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" data-count="0"><span id="stat-concluidos">0</span></div>
-                                <div class="stat-label-modern">Serviços Concluídos</div>
-                            </div>
-                            <div class="stat-card-arrow">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
-                        </div>
-
-                        <div class="stat-card-modern animate-fade-in-up" style="animation-delay: 0.4s;">
-                            <div class="stat-icon-modern icon-gradient-orange">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <div class="stat-content-modern">
-                                <div class="stat-number-modern" style="font-size: 20px;"><span id="stat-gasto-mes">R$ 0,00</span></div>
-                                <div class="stat-label-modern">Gasto no Mês</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Próximos agendamentos -->
-                    <div class="upcoming-section" id="upcoming-appointments-section" style="display: none;">
-                        <h2>
-                            <i class="fas fa-calendar-day"></i>
-                            Seus Próximos Agendamentos
-                        </h2>
-                        <div id="upcoming-appointments-list"></div>
-                    </div>
-
-                    <!-- Acesso rápido -->
-                    <div class="quick-actions">
-                        <h2 class="section-title">
-                            Acesso Rápido
-                        </h2>
-                        <div class="actions-grid">
-                            <button class="elegant-card btn-modern" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);">
-                                <div class="custom-icon icon-gradient-blue">
-                                    <i class="fas fa-list"></i>
-                                </div>
-                                <div style="flex: 1;">
-                                    <h3>Meus Agendamentos</h3>
-                                    <p>Ver todos os agendamentos</p>
-                                </div>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                            
-                            <button class="elegant-card btn-modern" onclick="showSection('historico-cliente')">
-                                <div class="custom-icon icon-gradient-blue">
-                                    <i class="fas fa-history"></i>
-                                </div>
-                                <div style="flex: 1;">
-                                    <h3>Histórico</h3>
-                                    <p>Serviços anteriores</p>
-                                </div>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                            
-                            <button class="elegant-card btn-modern" onclick="showSection('perfil-cliente')">
-                                <div class="custom-icon icon-gradient-blue">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div style="flex: 1;">
-                                    <h3>Meu Perfil</h3>
-                                    <p>Editar informações</p>
-                                </div>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
                 
                 <!-- Agendamentos com Abas -->
                 <div id="agendamentos-cliente" class="content-section">
@@ -552,6 +429,17 @@
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
             if (activeBtn) activeBtn.classList.add('active');
+            
+            // Carregar dados específicos da seção
+            if (sectionId === 'historico-cliente' && typeof loadHistoricoCliente === 'function') {
+                loadHistoricoCliente();
+            }
+            if (sectionId === 'agendamentos-cliente' && typeof carregarAgendamentos === 'function') {
+                carregarAgendamentos();
+            }
+            if (sectionId === 'home-cliente' && typeof loadClienteDashboard === 'function') {
+                loadClienteDashboard();
+            }
         }
     </script>
 </body>

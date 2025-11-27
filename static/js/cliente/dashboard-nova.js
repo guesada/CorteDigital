@@ -393,15 +393,167 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         loadClienteDashboard();
         carregarAgendamentos();
+        loadHistoricoCliente();
     });
 } else {
     loadClienteDashboard();
     carregarAgendamentos();
+    loadHistoricoCliente();
 }
 
 // Exportar
 window.loadClienteDashboard = loadClienteDashboard;
 window.carregarAgendamentos = carregarAgendamentos;
 window.cancelarAgendamento = cancelarAgendamento;
+window.loadHistoricoCliente = loadHistoricoCliente;
 window.fecharModalCancelamento = fecharModalCancelamento;
 window.confirmarCancelamento = confirmarCancelamento;
+
+
+// ===== HISTÓRICO DE SERVIÇOS =====
+async function loadHistoricoCliente() {
+    console.log('📜 Carregando histórico de serviços...');
+    
+    const container = document.getElementById('historico-lista');
+    if (!container) return;
+    
+    // Mostrar loading
+    container.innerHTML = `
+        <div class="historico-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            Carregando histórico...
+        </div>
+    `;
+    
+    try {
+        const response = await fetch('/api/appointments');
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.message || 'Erro ao carregar histórico');
+        }
+        
+        const appointments = result.data || [];
+        
+        console.log('📦 Total de agendamentos:', appointments.length);
+        console.log('📋 Status dos agendamentos:', appointments.map(a => ({ id: a.id, status: a.status })));
+        
+        // Normalizar campos
+        appointments.forEach(a => {
+            if (!a.data && a.date) a.data = a.date;
+            if (!a.horario && a.time) a.horario = a.time;
+            if (!a.preco && a.total_price) a.preco = a.total_price;
+            if (!a.servico && a.service) a.servico = a.service;
+            if (!a.barbeiro && a.barber_name) a.barbeiro = a.barber_name;
+        });
+        
+        // Filtrar apenas concluídos
+        const concluidos = appointments.filter(a => a.status === 'concluido');
+        
+        console.log('✅ Agendamentos concluídos:', concluidos.length);
+        
+        // Ordenar por data (mais recentes primeiro)
+        concluidos.sort((a, b) => {
+            const dateA = a.data;
+            const dateB = b.data;
+            if (dateA !== dateB) return dateB.localeCompare(dateA);
+            return b.horario.localeCompare(a.horario);
+        });
+        
+        // Atualizar stats
+        const totalElement = document.getElementById('historico-total');
+        const gastoElement = document.getElementById('historico-gasto');
+        
+        if (totalElement) totalElement.textContent = concluidos.length;
+        
+        const totalGasto = concluidos.reduce((sum, a) => {
+            return sum + (parseFloat(a.preco || 0));
+        }, 0);
+        
+        console.log('💰 Total gasto:', totalGasto);
+        
+        if (gastoElement) gastoElement.textContent = totalGasto.toFixed(2).replace('.', ',');
+        
+        // Renderizar histórico
+        if (concluidos.length === 0) {
+            container.innerHTML = `
+                <div class="historico-empty">
+                    <div class="historico-empty-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="historico-empty-title">Nenhum serviço realizado ainda</div>
+                    <div class="historico-empty-text">
+                        Quando você concluir seus primeiros atendimentos, eles aparecerão aqui.
+                    </div>
+                    <button class="historico-empty-btn" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('novo-agendamento'), 100);">
+                        <i class="fas fa-calendar-plus"></i>
+                        Agendar Agora
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = concluidos.map(apt => {
+            const aptDate = apt.data;
+            const aptTime = apt.horario;
+            const aptService = apt.servico;
+            const aptBarber = apt.barbeiro;
+            const aptPrice = apt.preco;
+            
+            const date = new Date(aptDate + 'T00:00:00');
+            const dateFormatted = date.toLocaleDateString('pt-BR', { 
+                day: '2-digit', 
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            return `
+                <div class="historico-item">
+                    <div class="historico-item-header">
+                        <div class="historico-item-date">
+                            <i class="fas fa-calendar"></i>
+                            ${dateFormatted} às ${aptTime}
+                        </div>
+                        <div class="historico-item-badge">
+                            <i class="fas fa-check-circle"></i> Concluído
+                        </div>
+                    </div>
+                    <div class="historico-item-content">
+                        <div class="historico-item-info">
+                            <div class="historico-item-service">
+                                <i class="fas fa-cut"></i>
+                                ${aptService}
+                            </div>
+                            <div class="historico-item-details">
+                                <div class="historico-item-detail">
+                                    <i class="fas fa-user"></i>
+                                    ${aptBarber}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="historico-item-price">
+                            R$ ${parseFloat(aptPrice).toFixed(2).replace('.', ',')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        console.log('✅ Histórico carregado:', concluidos.length, 'serviços');
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar histórico:', error);
+        container.innerHTML = `
+            <div class="historico-empty">
+                <div class="historico-empty-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="historico-empty-title">Erro ao carregar histórico</div>
+                <div class="historico-empty-text">
+                    Não foi possível carregar seu histórico de serviços. Tente novamente.
+                </div>
+            </div>
+        `;
+    }
+}
