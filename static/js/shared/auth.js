@@ -2,23 +2,36 @@
 
 async function fazerLogin(e, destino) {
   e.preventDefault();
+  console.log('🔐 Tentando fazer login...', { destino });
+  
   const form = e.target;
   const email = form.querySelector('input[type="email"]').value;
   const password = form.querySelector('input[type="password"]').value;
 
+  console.log('📧 Email:', email);
+  console.log('🔑 API_BASE:', window.API_BASE);
+
   try {
-    const response = await fetch(`${API_BASE}/users/login`, {
+    const url = `${window.API_BASE}/users/login`;
+    console.log('🌐 URL:', url);
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ email, password })
     });
 
+    console.log('📡 Response status:', response.status);
     const data = await response.json();
+    console.log('📦 Response data:', data);
+    
     if (data.success) {
       const userType = data.user?.userType || destino;
+      console.log('✅ Login bem-sucedido! Redirecionando para:', userType);
       window.location.href = userType === 'barbeiro' ? '/barbeiro' : '/cliente';
     } else {
+      console.error('❌ Login falhou:', data.message);
       if (typeof showNotificationToast === 'function') {
         showNotificationToast(data.message || 'Não foi possível entrar', 'error');
       } else {
@@ -26,11 +39,11 @@ async function fazerLogin(e, destino) {
       }
     }
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Erro no login:', error);
     if (typeof showNotificationToast === 'function') {
       showNotificationToast('Erro ao fazer login', 'error');
     } else {
-      alert('Erro ao fazer login');
+      alert('Erro ao fazer login: ' + error.message);
     }
   }
 }
