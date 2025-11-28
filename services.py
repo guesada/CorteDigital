@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 
 from flask import session, current_app
 
-from db import db, Cliente, Barber, Service, Appointment, Product, Notification, Report, DEFAULT_HORARIOS
+from db import db, Cliente, Barber, Service, Appointment, Product, Report, DEFAULT_HORARIOS
 
 
 def init_app(app):

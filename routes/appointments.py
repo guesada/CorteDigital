@@ -27,15 +27,7 @@ def validate_datetime(date_str, time_str):
         return "Data ou horário inválido"
 
 
-def notify_barber(barber_id, client_name, service_name, date_str, time_str, apt_id):
-    """Cria notificação para o barbeiro."""
-    try:
-        from routes.notifications import create_notification
-        date_formatted = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d/%m/%Y")
-        message = f"{client_name} agendou {service_name} para {date_formatted} às {time_str}"
-        create_notification(barber_id, 'Novo Agendamento', message, 'new-appointment', str(apt_id))
-    except Exception as e:
-        print(f"Erro ao criar notificação: {e}")
+
 
 
 @appointments_bp.route("", methods=["GET", "POST"])
@@ -68,10 +60,6 @@ def appointments_root():
     # Criar agendamento
     novo = create_appointment(body)
     
-    # Notificar barbeiro
-    user = usuario_atual()
-    notify_barber(barber_id, user.get('name', 'Cliente'), body['serviceName'], date, time, novo.get('id'))
-    
     return jsonify({"success": True, "data": novo}), 201
 
 
@@ -79,13 +67,6 @@ def appointments_root():
 def cancel_appointment(appointment_id: str):
     if not exigir_login():
         return jsonify({"success": False, "message": "Não autenticado"}), 401
-    
-    # Remover notificações relacionadas ao agendamento cancelado
-    try:
-        from routes.notifications import delete_notification_by_data
-        delete_notification_by_data(appointment_id)
-    except Exception as e:
-        print(f"Erro ao remover notificação: {e}")
     
     if not cancel_appointment_by_id(appointment_id):
         return jsonify({"success": False, "message": "Agendamento não encontrado"}), 404
@@ -103,14 +84,6 @@ def update_status(appointment_id: str):
 
     if not update_appointment_status(appointment_id, status):
         return jsonify({"success": False, "message": "Agendamento não encontrado"}), 404
-    
-    # Remover notificações quando concluído ou cancelado
-    if status in ['concluido', 'cancelado']:
-        try:
-            from routes.notifications import delete_notification_by_data
-            delete_notification_by_data(appointment_id)
-        except Exception as e:
-            print(f"Erro ao remover notificação: {e}")
     
     return jsonify({"success": True})
 
