@@ -442,6 +442,24 @@
   box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
+/* Mensagem informativa */
+.agendamento-info-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  color: #3b82f6;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.agendamento-info-message i {
+  font-size: 16px;
+}
+
 /* Empty State */
 .empty-agendamentos {
   text-align: center;

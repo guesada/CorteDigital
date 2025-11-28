@@ -273,14 +273,32 @@ async function carregarAgendamentos() {
                         </div>
                     </div>
                     
-                    ${aptStatus !== 'cancelado' && aptStatus !== 'concluido' ? `
-                        <div class="agendamento-actions">
-                            <button class="agendamento-btn agendamento-btn-cancel" onclick="cancelarAgendamento('${apt.id}')">
-                                <i class="fas fa-times"></i>
-                                Cancelar
-                            </button>
-                        </div>
-                    ` : ''}
+                    ${(() => {
+                        // Verificar se o agendamento já passou
+                        const now = new Date();
+                        const appointmentDateTime = new Date(`${apt.date}T${apt.time}`);
+                        const hasPassed = appointmentDateTime <= now;
+                        const canCancel = aptStatus !== 'cancelado' && aptStatus !== 'concluido' && !hasPassed;
+                        
+                        if (canCancel) {
+                            return `
+                                <div class="agendamento-actions">
+                                    <button class="agendamento-btn agendamento-btn-cancel" onclick="cancelarAgendamento('${apt.id}')">
+                                        <i class="fas fa-times"></i>
+                                        Cancelar
+                                    </button>
+                                </div>
+                            `;
+                        } else if (hasPassed && aptStatus !== 'cancelado' && aptStatus !== 'concluido') {
+                            return `
+                                <div class="agendamento-info-message">
+                                    <i class="fas fa-info-circle"></i>
+                                    Agendamento já passou
+                                </div>
+                            `;
+                        }
+                        return '';
+                    })()}
                 </div>
             `;
         }).join('');
