@@ -44,10 +44,17 @@ def get_barber_prices():
 @barber_prices_bp.post("")
 def update_barber_prices():
     """Atualizar preços do barbeiro logado."""
-    if not exigir_login("barbeiro"):
-        return jsonify({"success": False, "message": "Apenas barbeiros"}), 403
-    
     user = usuario_atual()
+    
+    # Debug
+    print(f"🔍 Usuário atual: {user}")
+    print(f"🔍 Tipo: {user.get('tipo') if user else 'None'}")
+    
+    if not user:
+        return jsonify({"success": False, "message": "Não autenticado"}), 401
+    
+    if user.get('tipo') != 'barbeiro':
+        return jsonify({"success": False, "message": f"Apenas barbeiros. Você é: {user.get('tipo')}"}), 403
     barbeiro_id = user['id']
     barbeiro_nome = user['name']
     

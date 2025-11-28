@@ -54,6 +54,7 @@ async function checkNewNotifications() {
         if (!response.ok) {
             if (response.status === 401) {
                 // Não autenticado, parar polling
+                console.log('🔕 Não autenticado, parando polling');
                 stopNotificationPolling();
                 return;
             }
@@ -65,6 +66,8 @@ async function checkNewNotifications() {
         if (result.success) {
             const { notifications, unreadCount } = result;
             
+            console.log(`🔔 Verificação: ${notifications.length} novas, ${unreadCount} não lidas`);
+            
             // Atualizar contador
             const oldCount = notificationState.unreadCount;
             notificationState.unreadCount = unreadCount;
@@ -72,9 +75,10 @@ async function checkNewNotifications() {
             
             // Mostrar novas notificações
             if (notifications && notifications.length > 0) {
-                console.log(`🔔 ${notifications.length} nova(s) notificação(ões)`);
+                console.log(`🔔 Mostrando ${notifications.length} notificação(ões):`);
                 
                 notifications.forEach(notif => {
+                    console.log(`  📧 ${notif.title}: ${notif.message}`);
                     showInstantNotification(notif);
                 });
                 
@@ -259,17 +263,19 @@ window.closeInstantNotification = closeInstantNotification;
 window.markNotificationAsRead = markNotificationAsRead;
 window.toggleNotifications = toggleNotifications;
 
-// ===== AUTO-INICIAR PARA CLIENTES =====
+// ===== AUTO-INICIAR APENAS PARA CLIENTES =====
 document.addEventListener('DOMContentLoaded', () => {
-    // Verificar se é cliente logado
-    const isCliente = document.body.classList.contains('cliente-dashboard') || 
-                     document.getElementById('dashboard-cliente');
+    // Verificar se é cliente logado (não barbeiro)
+    const isCliente = document.getElementById('dashboard-cliente');
+    const isBarbeiro = document.getElementById('dashboard-barbeiro');
     
-    if (isCliente) {
+    if (isCliente && !isBarbeiro) {
         console.log('👤 Cliente detectado, iniciando polling de notificações');
         setTimeout(() => {
             startNotificationPolling();
         }, 2000); // Aguardar 2s após carregar a página
+    } else if (isBarbeiro) {
+        console.log('💈 Barbeiro detectado, polling de notificações desabilitado');
     }
 });
 
