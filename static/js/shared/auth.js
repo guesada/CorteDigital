@@ -64,13 +64,43 @@ async function fazerCadastro(e, tipo) {
   const email = form.querySelector('input[type="email"]').value;
   const password = form.querySelector('input[type="password"]').value;
   const phone = form.querySelector('input[name="phone"]')?.value || '';
+  
+  // Capturar dias e horários de trabalho (apenas para barbeiros)
+  let workDays = [];
+  let workHours = [];
+  
+  if (tipo === 'barbeiro') {
+    // Capturar dias selecionados
+    const dayCheckboxes = form.querySelectorAll('input[name="workDays"]:checked');
+    workDays = Array.from(dayCheckboxes).map(cb => cb.value);
+    
+    // Capturar horários
+    const startTime = form.querySelector('select[name="workTimeStart"]')?.value;
+    const endTime = form.querySelector('select[name="workTimeEnd"]')?.value;
+    
+    // Gerar horários disponíveis
+    if (startTime && endTime) {
+      workHours = generateTimeSlots(startTime, endTime);
+    }
+    
+    console.log('📅 Dias de trabalho:', workDays);
+    console.log('⏰ Horários de trabalho:', workHours);
+  }
 
   try {
     const response = await fetch(`${API_BASE}/users/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ name, email, password, phone, userType: tipo })
+      body: JSON.stringify({ 
+        name, 
+        email, 
+        password, 
+        phone, 
+        userType: tipo,
+        workDays: workDays,
+        workHours: workHours
+      })
     });
 
     const data = await response.json();
@@ -111,7 +141,30 @@ async function logout() {
   }
 }
 
+// ===== GERAR HORÁRIOS DISPONÍVEIS =====
+function generateTimeSlots(startTime, endTime) {
+  const slots = [];
+  
+  // Converter para minutos
+  const [startHour, startMin] = startTime.split(':').map(Number);
+  const [endHour, endMin] = endTime.split(':').map(Number);
+  
+  const startMinutes = startHour * 60 + startMin;
+  const endMinutes = endHour * 60 + endMin;
+  
+  // Gerar slots de 1 hora
+  for (let minutes = startMinutes; minutes < endMinutes; minutes += 60) {
+    const hour = Math.floor(minutes / 60);
+    const min = minutes % 60;
+    const timeStr = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    slots.push(timeStr);
+  }
+  
+  return slots;
+}
+
 // Export
 window.fazerLogin = fazerLogin;
 window.fazerCadastro = fazerCadastro;
 window.logout = logout;
+window.generateTimeSlots = generateTimeSlots;
