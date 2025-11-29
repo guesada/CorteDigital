@@ -10,5 +10,4 @@ with app.app_context():
     
     print("✅ Banco de dados atualizado com sucesso!")
     print("📋 Novas tabelas criadas:")
-    print("  - reviews (avaliações)")
     print("  - statistics (estatísticas)")
