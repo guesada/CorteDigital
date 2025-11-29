@@ -12,4 +12,3 @@ def register_routes(app):
     app.register_blueprint(appointments.appointments_bp)
     app.register_blueprint(barber_prices.barber_prices_bp)
     app.register_blueprint(barber_schedule.barber_schedule_bp)
-
