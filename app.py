@@ -1,8 +1,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+import os
 
 from routes import register_routes
-import services
+from db import db
 
 app = Flask(__name__)
 
@@ -14,8 +15,19 @@ app.config["JSON_SORT_KEYS"] = False
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 
-# Inicializa a conexão com o banco e dados iniciais
-services.init_app(app)
+# ===== CONFIGURAÇÃO DO BANCO DE DADOS =====
+# Usar SQLite local para portabilidade
+db_path = os.path.join(os.path.dirname(__file__), 'corte_digital.db')
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Inicializar banco de dados
+db.init_app(app)
+
+# Criar tabelas e popular com dados de exemplo se necessário
+with app.app_context():
+    from init_database import init_database_with_sample_data
+    init_database_with_sample_data(app, db)
 
 register_routes(app)
 
