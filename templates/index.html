@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/visual-improvements.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/modern-upgrade.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/login-forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/tela-registro.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Seletor de Dias */
@@ -196,174 +197,307 @@
         </div>
     </div>
 
-    <!-- Cadastro Cliente -->
+    <!-- Cadastro Cliente Premium -->
     <div id="register-cliente" class="screen">
-        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
-            <div style="max-width: 420px; width: 100%;">
-                <div class="elegant-card" style="padding: 40px;">
-                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Voltar</span>
+        <div class="register-container">
+            <div class="register-card">
+                <!-- Header -->
+                <div class="register-header">
+                    <div class="register-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="register-title">Criar Conta</h2>
+                    <p class="register-subtitle">Cadastre-se e comece a agendar seus cortes</p>
+                </div>
+
+                <!-- Formulário -->
+                <form id="register-cliente-form" class="register-form" onsubmit="fazerCadastro(event, 'cliente')">
+                    <!-- Nome -->
+                    <div class="form-group-premium">
+                        <label class="form-label-premium">Nome Completo</label>
+                        <div class="form-input-wrapper">
+                            <i class="fas fa-user form-input-icon"></i>
+                            <input 
+                                type="text" 
+                                name="name" 
+                                class="form-input-premium" 
+                                placeholder="Digite seu nome completo" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Email e Telefone -->
+                    <div class="form-row">
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">E-mail</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-envelope form-input-icon"></i>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    class="form-input-premium" 
+                                    placeholder="seu@email.com" 
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">Telefone</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-phone form-input-icon"></i>
+                                <input 
+                                    type="tel" 
+                                    name="phone" 
+                                    class="form-input-premium" 
+                                    placeholder="(11) 99999-9999"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Senha e Confirmar Senha -->
+                    <div class="form-row">
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">Senha</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-lock form-input-icon"></i>
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    class="form-input-premium" 
+                                    placeholder="Mínimo 6 caracteres" 
+                                    required
+                                    minlength="6"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">Confirmar Senha</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-lock form-input-icon"></i>
+                                <input 
+                                    type="password" 
+                                    name="confirmPassword" 
+                                    class="form-input-premium" 
+                                    placeholder="Confirme sua senha" 
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Cadastro -->
+                    <button type="submit" class="btn-register-premium">
+                        <i class="fas fa-user-plus"></i>
+                        Criar Minha Conta
                     </button>
+                </form>
 
-                    <div style="text-align: center; margin-bottom: 32px;">
-                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Criar Conta</h2>
-                        <p style="font-size: 14px; color: var(--color-text-secondary);">Cadastre-se como cliente</p>
-                    </div>
-
-                    <form id="register-cliente-form" onsubmit="fazerCadastro(event, 'cliente')">
-                        <div class="form-group">
-                            <label class="form-label">Nome</label>
-                            <input type="text" name="name" class="form-control" placeholder="Seu nome completo" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">E-mail</label>
-                            <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Telefone</label>
-                            <input type="tel" name="phone" class="form-control" placeholder="(11) 99999-9999">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Senha</label>
-                            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Confirmar Senha</label>
-                            <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme sua senha" required>
-                        </div>
-                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
-                            Criar Conta
-                        </button>
-                    </form>
-
-                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
-                        <a href="#" onclick="showLogin('cliente'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Já tem conta? Faça login</a>
-                    </div>
+                <!-- Footer -->
+                <div class="register-footer">
+                    <p class="register-footer-text">Já possui uma conta?</p>
+                    <a href="#" onclick="showLogin('cliente'); return false;" class="register-footer-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Fazer Login
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Cadastro Barbeiro -->
+    <!-- Cadastro Barbeiro Premium -->
     <div id="register-barbeiro" class="screen">
-        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--color-background);">
-            <div style="max-width: 420px; width: 100%;">
-                <div class="elegant-card" style="padding: 40px;">
-                    <button onclick="goBack()" style="background: none; border: none; color: var(--color-text-secondary); cursor: pointer; padding: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: color 0.2s;">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Voltar</span>
+        <div class="register-container">
+            <div class="register-card">
+                <!-- Header -->
+                <div class="register-header">
+                    <div class="register-icon">
+                        <i class="fas fa-scissors"></i>
+                    </div>
+                    <h2 class="register-title">Cadastro Profissional</h2>
+                    <p class="register-subtitle">Crie sua conta e comece a gerenciar sua agenda</p>
+                </div>
+
+                <!-- Formulário -->
+                <form id="register-barbeiro-form" class="register-form" onsubmit="fazerCadastro(event, 'barbeiro')">
+                    <!-- Nome -->
+                    <div class="form-group-premium">
+                        <label class="form-label-premium">Nome Profissional</label>
+                        <div class="form-input-wrapper">
+                            <i class="fas fa-user-tie form-input-icon"></i>
+                            <input 
+                                type="text" 
+                                name="name" 
+                                class="form-input-premium" 
+                                placeholder="Digite seu nome profissional" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Email e Telefone -->
+                    <div class="form-row">
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">E-mail Profissional</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-envelope form-input-icon"></i>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    class="form-input-premium" 
+                                    placeholder="barbeiro@email.com" 
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">Telefone</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-phone form-input-icon"></i>
+                                <input 
+                                    type="tel" 
+                                    name="phone" 
+                                    class="form-input-premium" 
+                                    placeholder="(11) 99999-9999"
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Senha e Confirmar Senha -->
+                    <div class="form-row">
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">Senha</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-lock form-input-icon"></i>
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    class="form-input-premium" 
+                                    placeholder="Mínimo 6 caracteres" 
+                                    required
+                                    minlength="6"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group-premium">
+                            <label class="form-label-premium">Confirmar Senha</label>
+                            <div class="form-input-wrapper">
+                                <i class="fas fa-lock form-input-icon"></i>
+                                <input 
+                                    type="password" 
+                                    name="confirmPassword" 
+                                    class="form-input-premium" 
+                                    placeholder="Confirme sua senha" 
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dias de Trabalho -->
+                    <div class="form-group-premium">
+                        <label class="form-label-premium">
+                            <i class="fas fa-calendar-week"></i>
+                            Dias de Trabalho
+                        </label>
+                        <div class="days-selector-premium">
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Segunda" checked>
+                                <div class="day-label">
+                                    <span class="day-name">Seg</span>
+                                </div>
+                            </label>
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Terça" checked>
+                                <div class="day-label">
+                                    <span class="day-name">Ter</span>
+                                </div>
+                            </label>
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Quarta" checked>
+                                <div class="day-label">
+                                    <span class="day-name">Qua</span>
+                                </div>
+                            </label>
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Quinta" checked>
+                                <div class="day-label">
+                                    <span class="day-name">Qui</span>
+                                </div>
+                            </label>
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Sexta" checked>
+                                <div class="day-label">
+                                    <span class="day-name">Sex</span>
+                                </div>
+                            </label>
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Sábado" checked>
+                                <div class="day-label">
+                                    <span class="day-name">Sáb</span>
+                                </div>
+                            </label>
+                            <label class="day-item">
+                                <input type="checkbox" name="workDays" value="Domingo">
+                                <div class="day-label">
+                                    <span class="day-name">Dom</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Horários de Trabalho -->
+                    <div class="form-group-premium">
+                        <label class="form-label-premium">
+                            <i class="fas fa-clock"></i>
+                            Horário de Trabalho
+                        </label>
+                        <div class="time-range-premium">
+                            <div class="time-input-group">
+                                <label>Início</label>
+                                <select name="workTimeStart" class="form-select-premium" required>
+                                    <option value="06:00">06:00</option>
+                                    <option value="07:00">07:00</option>
+                                    <option value="08:00" selected>08:00</option>
+                                    <option value="09:00">09:00</option>
+                                    <option value="10:00">10:00</option>
+                                </select>
+                            </div>
+                            <div class="time-separator">→</div>
+                            <div class="time-input-group">
+                                <label>Fim</label>
+                                <select name="workTimeEnd" class="form-select-premium" required>
+                                    <option value="16:00">16:00</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:00" selected>18:00</option>
+                                    <option value="19:00">19:00</option>
+                                    <option value="20:00">20:00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Cadastro -->
+                    <button type="submit" class="btn-register-premium">
+                        <i class="fas fa-scissors"></i>
+                        Criar Conta Profissional
                     </button>
+                </form>
 
-                    <div style="text-align: center; margin-bottom: 32px;">
-                        <h2 style="font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 8px;">Cadastro Profissional</h2>
-                        <p style="font-size: 14px; color: var(--color-text-secondary);">Crie sua conta de barbeiro</p>
-                    </div>
-
-                    <form id="register-barbeiro-form" onsubmit="fazerCadastro(event, 'barbeiro')">
-                        <div class="form-group">
-                            <label class="form-label">Nome Profissional</label>
-                            <input type="text" name="name" class="form-control" placeholder="Seu nome profissional" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">E-mail Profissional</label>
-                            <input type="email" name="email" class="form-control" placeholder="barbeiro@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Telefone</label>
-                            <input type="tel" name="phone" class="form-control" placeholder="(11) 99999-9999" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Senha</label>
-                            <input type="password" name="password" class="form-control" placeholder="Mínimo 6 caracteres" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Confirmar Senha</label>
-                            <input type="password" name="confirmPassword" class="form-control" placeholder="Confirme sua senha" required>
-                        </div>
-                        
-                        <!-- Dias de Trabalho -->
-                        <div class="form-group">
-                            <label class="form-label">Dias de Trabalho</label>
-                            <div class="days-selector">
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Segunda" checked>
-                                    <span>Seg</span>
-                                </label>
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Terça" checked>
-                                    <span>Ter</span>
-                                </label>
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Quarta" checked>
-                                    <span>Qua</span>
-                                </label>
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Quinta" checked>
-                                    <span>Qui</span>
-                                </label>
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Sexta" checked>
-                                    <span>Sex</span>
-                                </label>
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Sábado" checked>
-                                    <span>Sáb</span>
-                                </label>
-                                <label class="day-checkbox">
-                                    <input type="checkbox" name="workDays" value="Domingo">
-                                    <span>Dom</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- Horários de Trabalho -->
-                        <div class="form-group">
-                            <label class="form-label">Horários de Trabalho</label>
-                            <div class="time-selector">
-                                <div class="time-range">
-                                    <div style="flex: 1;">
-                                        <label style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; display: block;">Início</label>
-                                        <select name="workTimeStart" class="form-control" required>
-                                            <option value="06:00">06:00</option>
-                                            <option value="07:00">07:00</option>
-                                            <option value="08:00" selected>08:00</option>
-                                            <option value="09:00">09:00</option>
-                                            <option value="10:00">10:00</option>
-                                            <option value="11:00">11:00</option>
-                                            <option value="12:00">12:00</option>
-                                        </select>
-                                    </div>
-                                    <div style="padding: 20px 8px 0 8px; color: var(--color-text-secondary);">até</div>
-                                    <div style="flex: 1;">
-                                        <label style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; display: block;">Fim</label>
-                                        <select name="workTimeEnd" class="form-control" required>
-                                            <option value="14:00">14:00</option>
-                                            <option value="15:00">15:00</option>
-                                            <option value="16:00">16:00</option>
-                                            <option value="17:00">17:00</option>
-                                            <option value="18:00" selected>18:00</option>
-                                            <option value="19:00">19:00</option>
-                                            <option value="20:00">20:00</option>
-                                            <option value="21:00">21:00</option>
-                                            <option value="22:00">22:00</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 8px;">
-                                    <i class="fas fa-info-circle"></i> Horários disponíveis serão gerados automaticamente
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn--primary btn-modern" style="width: 100%; margin-top: 8px;">
-                            Criar Conta Profissional
-                        </button>
-                    </form>
-
-                    <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--color-border);">
-                        <a href="#" onclick="showLogin('barbeiro'); return false;" style="color: var(--color-primary); text-decoration: none; font-size: 14px;">Já tem conta? Faça login</a>
-                    </div>
+                <!-- Footer -->
+                <div class="register-footer">
+                    <p class="register-footer-text">Já possui uma conta profissional?</p>
+                    <a href="#" onclick="showLogin('barbeiro'); return false;" class="register-footer-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Fazer Login
+                    </a>
                 </div>
             </div>
         </div>
