@@ -12,10 +12,13 @@ def test_mysql_connection():
     
     # Carregar configuração
     try:
-        from config_database import MYSQL_CONFIG
-        print("✅ Arquivo config_database.py encontrado")
+        import sys
+        import os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+        from config.config_database import MYSQL_CONFIG
+        print("✅ Arquivo config/config_database.py encontrado")
     except ImportError:
-        print("❌ Arquivo config_database.py não encontrado!")
+        print("❌ Arquivo config/config_database.py não encontrado!")
         print("💡 Crie o arquivo com as credenciais do MySQL")
         return False
     

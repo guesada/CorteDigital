@@ -12,7 +12,7 @@ def restore_database(backup_file):
         print(f"❌ Arquivo de backup não encontrado: {backup_file}")
         return False
     
-    db_file = 'corte_digital.db'
+    db_file = 'database/corte_digital.db'
     
     # Fazer backup do banco atual se existir
     if os.path.exists(db_file):

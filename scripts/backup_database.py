@@ -9,7 +9,7 @@ from datetime import datetime
 def backup_database():
     """Cria um backup do banco de dados atual"""
     
-    db_file = 'corte_digital.db'
+    db_file = 'database/corte_digital.db'
     
     if not os.path.exists(db_file):
         print("❌ Banco de dados não encontrado!")
