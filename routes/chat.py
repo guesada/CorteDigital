@@ -76,7 +76,8 @@ def register_socketio_events(socketio):
         
         try:
             user_id = session['user_id']
-            message = chat_service.send_message(conversation_id, user_id, message_text)
+            user_tipo = session['tipo']
+            message = chat_service.send_message(conversation_id, user_id, user_tipo, message_text)
             
             # Envia mensagem para todos na conversa
             emit('new_message', message, room=f'conversation_{conversation_id}')
@@ -93,7 +94,7 @@ def register_socketio_events(socketio):
             cursor.close()
             conn.close()
             
-            recipient_id = conv['barbeiro_id'] if user_id == conv['cliente_id'] else conv['cliente_id']
+            recipient_id = conv['barbeiro_id'] if user_tipo == 'cliente' else conv['cliente_id']
             
             emit('conversation_updated', {
                 'conversation_id': conversation_id,
