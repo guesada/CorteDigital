@@ -21,8 +21,8 @@ def create_chat_tables():
                 cliente_unread INT DEFAULT 0,
                 barbeiro_unread INT DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (cliente_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-                FOREIGN KEY (barbeiro_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+                FOREIGN KEY (barbeiro_id) REFERENCES barbers(id) ON DELETE CASCADE,
                 UNIQUE KEY unique_conversation (cliente_id, barbeiro_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         """)
@@ -33,11 +33,11 @@ def create_chat_tables():
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 conversation_id INT NOT NULL,
                 sender_id INT NOT NULL,
+                sender_type ENUM('cliente', 'barbeiro') NOT NULL,
                 message TEXT NOT NULL,
                 is_read BOOLEAN DEFAULT FALSE,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
-                FOREIGN KEY (sender_id) REFERENCES usuarios(id) ON DELETE CASCADE,
                 INDEX idx_conversation (conversation_id),
                 INDEX idx_created (created_at)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -86,7 +86,7 @@ def get_or_create_conversation(cliente_id, barbeiro_id):
         conn.close()
 
 
-def send_message(conversation_id, sender_id, message):
+def send_message(conversation_id, sender_id, sender_type, message):
     """Envia uma mensagem no chat"""
     conn = get_database_connection()
     cursor = conn.cursor()
@@ -94,9 +94,9 @@ def send_message(conversation_id, sender_id, message):
     try:
         # Insere a mensagem
         cursor.execute("""
-            INSERT INTO chat_messages (conversation_id, sender_id, message)
-            VALUES (%s, %s, %s)
-        """, (conversation_id, sender_id, message))
+            INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message)
+            VALUES (%s, %s, %s, %s)
+        """, (conversation_id, sender_id, sender_type, message))
         
         message_id = cursor.lastrowid
         
@@ -109,7 +109,7 @@ def send_message(conversation_id, sender_id, message):
         conv = cursor.fetchone()
         
         # Incrementa contador de não lidas para o destinatário
-        if sender_id == conv['cliente_id']:
+        if sender_type == 'cliente':
             cursor.execute("""
                 UPDATE chat_conversations 
                 SET barbeiro_unread = barbeiro_unread + 1,
@@ -126,13 +126,21 @@ def send_message(conversation_id, sender_id, message):
         
         conn.commit()
         
-        # Retorna a mensagem criada
-        cursor.execute("""
-            SELECT m.*, u.nome as sender_nome
-            FROM chat_messages m
-            JOIN usuarios u ON m.sender_id = u.id
-            WHERE m.id = %s
-        """, (message_id,))
+        # Retorna a mensagem criada com nome do remetente
+        if sender_type == 'cliente':
+            cursor.execute("""
+                SELECT m.*, c.nome as sender_nome, m.sender_type as sender_tipo
+                FROM chat_messages m
+                JOIN clientes c ON m.sender_id = c.id
+                WHERE m.id = %s
+            """, (message_id,))
+        else:
+            cursor.execute("""
+                SELECT m.*, b.nome as sender_nome, m.sender_type as sender_tipo
+                FROM chat_messages m
+                JOIN barbers b ON m.sender_id = b.id
+                WHERE m.id = %s
+            """, (message_id,))
         
         return cursor.fetchone()
         
@@ -148,9 +156,15 @@ def get_messages(conversation_id, limit=50):
     
     try:
         cursor.execute("""
-            SELECT m.*, u.nome as sender_nome, u.tipo as sender_tipo
+            SELECT 
+                m.*,
+                CASE 
+                    WHEN m.sender_type = 'cliente' THEN c.nome
+                    ELSE b.nome
+                END as sender_nome
             FROM chat_messages m
-            JOIN usuarios u ON m.sender_id = u.id
+            LEFT JOIN clientes c ON m.sender_id = c.id AND m.sender_type = 'cliente'
+            LEFT JOIN barbers b ON m.sender_id = b.id AND m.sender_type = 'barbeiro'
             WHERE m.conversation_id = %s
             ORDER BY m.created_at DESC
             LIMIT %s
@@ -162,6 +176,8 @@ def get_messages(conversation_id, limit=50):
         for msg in messages:
             if msg['created_at']:
                 msg['created_at'] = msg['created_at'].isoformat()
+            # Renomeia sender_type para sender_tipo
+            msg['sender_tipo'] = msg.get('sender_type', 'cliente')
         
         return list(reversed(messages))
         
@@ -231,7 +247,7 @@ def get_user_conversations(user_id, user_tipo):
                      WHERE conversation_id = c.id 
                      ORDER BY created_at DESC LIMIT 1) as last_message
                 FROM chat_conversations c
-                JOIN usuarios b ON c.barbeiro_id = b.id
+                JOIN barbers b ON c.barbeiro_id = b.id
                 WHERE c.cliente_id = %s
                 ORDER BY c.last_message_at DESC
             """, (user_id,))
@@ -247,7 +263,7 @@ def get_user_conversations(user_id, user_tipo):
                      WHERE conversation_id = c.id 
                      ORDER BY created_at DESC LIMIT 1) as last_message
                 FROM chat_conversations c
-                JOIN usuarios cl ON c.cliente_id = cl.id
+                JOIN clientes cl ON c.cliente_id = cl.id
                 WHERE c.barbeiro_id = %s
                 ORDER BY c.last_message_at DESC
             """, (user_id,))
