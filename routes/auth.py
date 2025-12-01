@@ -42,6 +42,9 @@ def api_login():
     session["usuario_email"] = usuario["email"]
     session["usuario_nome"] = usuario["nome"]
     session["usuario_tipo"] = usuario["tipo"]
+    # Adiciona campos para o chat
+    session["user_id"] = usuario["id"]
+    session["tipo"] = usuario["tipo"]
 
     return jsonify({
         "success": True,
