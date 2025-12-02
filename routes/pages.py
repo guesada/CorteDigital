@@ -30,32 +30,22 @@ def barbeiro_dashboard():
 @pages_bp.route("/chat")
 def chat():
     """Página de chat."""
+    from services import usuario_atual
+    
     # Verifica se está logado
-    if "usuario_email" not in session:
-        print("❌ Chat: Usuário não logado - redirecionando")
+    user_data = usuario_atual()
+    if not user_data:
         return redirect(url_for("pages.index"))
     
-    # Garante que user_id e tipo estejam na sessão
-    if "user_id" not in session or "tipo" not in session:
-        # Busca os dados do usuário
-        from services import usuario_atual
-        user_data = usuario_atual()
-        print(f"🔍 Chat: Buscando dados do usuário - {user_data}")
-        if user_data:
-            session["user_id"] = user_data["id"]
-            session["tipo"] = user_data["tipo"]
-            print(f"✅ Chat: Sessão atualizada - user_id={session['user_id']}, tipo={session['tipo']}")
-        else:
-            print("❌ Chat: Usuário não encontrado - redirecionando")
-            return redirect(url_for("pages.index"))
-    
-    print(f"✅ Chat: Renderizando página - nome={session.get('usuario_nome')}, tipo={session.get('tipo')}, user_id={session.get('user_id')}")
+    # Atualiza sessão com dados necessários para o chat
+    session["user_id"] = user_data["id"]
+    session["tipo"] = user_data["tipo"]
     
     return render_template(
         "chat.html",
-        nome=session.get("usuario_nome", "Usuário"),
-        tipo=session.get("tipo", "cliente"),
-        user_id=session.get("user_id")
+        nome=user_data.get("nome", "Usuário"),
+        tipo=user_data.get("tipo", "cliente"),
+        user_id=user_data.get("id")
     )
 
 
