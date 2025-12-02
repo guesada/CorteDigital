@@ -90,8 +90,11 @@ def handler_exception(erro):
 
 
 if __name__ == "__main__":
-    # Inicia o servidor Flask com SocketIO em modo de desenvolvimento
-    # host: 127.0.0.1 (localhost) - apenas conexões locais
-    # port: 5001 - porta do servidor
-    # debug: True - ativa modo debug com reload automático e mensagens detalhadas
-    socketio.run(app, host="127.0.0.1", port=5001, debug=True)
+    import os
+    # Inicia o servidor Flask com SocketIO
+    # Em produção, usa a porta do ambiente. Em desenvolvimento, usa 5001
+    port = int(os.environ.get("PORT", 5001))
+    host = os.environ.get("HOST", "127.0.0.1")
+    debug = os.environ.get("DEBUG", "True") == "True"
+    
+    socketio.run(app, host=host, port=port, debug=debug)
