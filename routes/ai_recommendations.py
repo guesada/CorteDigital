@@ -2,9 +2,9 @@
 Rotas para Recomendações com IA
 """
 from flask import Blueprint, jsonify, request, session
-from services.ai_recommendation_service import AIRecommendationService
+from app.services.ai_service import AIRecommendationService
 from datetime import datetime
-import db
+from app.core.database import get_db
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/api/ai')
 
@@ -62,7 +62,7 @@ def suggest_appointment():
             return jsonify({'success': False, 'message': 'Não autenticado'}), 401
         
         # Busca agendamentos do usuário
-        conn = db.get_db_connection()
+        conn = get_db()
         cursor = conn.cursor()
         
         cursor.execute('''
@@ -123,7 +123,7 @@ def recommend_service():
             return jsonify({'success': False, 'message': 'Não autenticado'}), 401
         
         # Busca agendamentos do usuário
-        conn = db.get_db_connection()
+        conn = get_db()
         cursor = conn.cursor()
         
         cursor.execute('''
@@ -181,7 +181,7 @@ def recommend_barber():
             return jsonify({'success': False, 'message': 'Não autenticado'}), 401
         
         # Busca agendamentos do usuário
-        conn = db.get_db_connection()
+        conn = get_db()
         cursor = conn.cursor()
         
         cursor.execute('''
@@ -236,7 +236,7 @@ def get_insights():
             return jsonify({'success': False, 'message': 'Não autenticado'}), 401
         
         # Busca agendamentos do usuário
-        conn = db.get_db_connection()
+        conn = get_db()
         cursor = conn.cursor()
         
         cursor.execute('''

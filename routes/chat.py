@@ -3,7 +3,7 @@ Rotas do sistema de chat
 """
 from flask import Blueprint, request, jsonify, session
 from flask_socketio import emit, join_room, leave_room
-from services import chat_service
+from app.services import chat_service
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -21,8 +21,8 @@ def get_available_users():
         return jsonify({'success': False, 'message': 'Não autenticado'}), 401
     
     try:
-        from database_config import get_database_connection
-        conn = get_database_connection()
+        from app.core.database import get_db
+        conn = get_db()
         cursor = conn.cursor()
         
         user_tipo = session.get('tipo', 'cliente')
@@ -262,8 +262,8 @@ def get_users_by_type(user_type):
         return jsonify({'success': False, 'message': 'Não autenticado'}), 401
     
     try:
-        from database_config import get_database_connection
-        conn = get_database_connection()
+        from app.core.database import get_db
+        conn = get_db()
         cursor = conn.cursor()
         
         current_user_id = session['user_id']

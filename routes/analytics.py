@@ -2,7 +2,7 @@
 Rotas de Analytics e Estatísticas
 """
 from flask import Blueprint, jsonify, session
-from services import analytics_service
+from app.services import analytics_service
 
 analytics_bp = Blueprint('analytics', __name__)
 

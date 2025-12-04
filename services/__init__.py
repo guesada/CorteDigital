@@ -1,13 +1,22 @@
 """
-Services Package - Serviços da Aplicação
-Re-exporta funções do services_legacy.py para compatibilidade
+Services Package - DEPRECATED
+Esta pasta está obsoleta. Use app.services ao invés disso.
+
+Os serviços foram movidos para:
+- app.services.ai_service
+- app.services.validation_service
+- app.services.chat_service
+- app.services.notification_service
+- app.services.analytics_service
+- app.services.review_service
 """
 
-# Re-exporta todas as funções do services_legacy
-from services_legacy import *
-
-# Importa novos serviços
-from . import chat_service
-from . import notification_service
-from . import analytics_service
-from . import review_service
+# Importa serviços antigos para compatibilidade temporária
+# TODO: Remover após migração completa
+try:
+    from . import chat_service
+    from . import notification_service
+    from . import analytics_service
+    from . import review_service
+except ImportError:
+    pass

@@ -1,239 +1,265 @@
-# 💈 Corte Digital - Sistema de Agendamento para Barbearias
+# 💈 Corte Digital v2.0.0
 
-Sistema completo de agendamento online para barbearias, desenvolvido com Flask e MySQL.
+> Sistema profissional de agendamento para barbearias com IA integrada
 
----
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
-### Para Clientes
-- ✅ Agendamento online de serviços
-- ✅ Visualização de agendamentos ativos
-- ✅ Histórico de serviços realizados
-- ✅ Cancelamento de agendamentos
+### ✨ Core Features
+- ✅ **Sistema de Agendamento** - Gestão completa de agendamentos
+- ✅ **Multi-usuário** - Clientes e Barbeiros
+- ✅ **Chat em Tempo Real** - WebSocket integrado
+- ✅ **Notificações Push** - Sistema de notificações em tempo real
+- ✅ **Sistema de Avaliações** - Reviews e ratings
 
-### Para Barbeiros
-- ✅ Dashboard profissional com métricas
-- ✅ Agenda inteligente com filtros
-- ✅ Gerenciamento de agendamentos
-- ✅ Relatórios de faturamento
-- ✅ Personalização de preços por serviço
+### 🤖 IA & Machine Learning
+- ✅ **Recomendações Inteligentes** - Sugestões baseadas em padrões
+- ✅ **Análise de Comportamento** - Insights personalizados
+- ✅ **Previsão de Horários** - Sugestões de próximos agendamentos
+- ✅ **Recomendação de Serviços** - Baseado em histórico
 
-### Sistema
-- ✅ Auto-conclusão de agendamentos (baseado em duração do serviço)
-- ✅ Validação de horários
-- ✅ Prevenção de conflitos
-- ✅ Interface moderna e responsiva
+### 🔒 Segurança
+- ✅ **Validação Avançada** - Email, telefone, CPF
+- ✅ **Rate Limiting** - Proteção contra spam
+- ✅ **Sanitização de Inputs** - Proteção XSS
+- ✅ **Sessões Seguras** - HTTPOnly cookies
 
----
+### 📊 Analytics
+- ✅ **Dashboard Completo** - Métricas em tempo real
+- ✅ **Relatórios** - Faturamento, agendamentos, clientes
+- ✅ **Gráficos Interativos** - Visualização de dados
 
-## 📋 Pré-requisitos
+## 🏗️ Arquitetura
 
-- Python 3.8+
-- MySQL 8.0+
-- pip (gerenciador de pacotes Python)
+```
+corte-digital/
+├── app/
+│   ├── api/v1/          # API REST versão 1
+│   ├── core/            # Módulos fundamentais
+│   ├── models/          # Modelos de dados
+│   ├── services/        # Lógica de negócio
+│   ├── utils/           # Utilitários
+│   ├── static/          # Arquivos estáticos
+│   └── templates/       # Templates HTML
+├── tests/               # Testes automatizados
+├── logs/                # Logs da aplicação
+├── uploads/             # Arquivos enviados
+└── migrations/          # Migrações de banco
+```
 
----
+## 🚀 Quick Start
 
-## 🔧 Instalação
+### Pré-requisitos
 
-### 1. Clone o repositório
+- Python 3.9+
+- pip
+- virtualenv (recomendado)
+
+### Instalação
+
+1. **Clone o repositório**
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/seu-usuario/corte-digital.git
 cd corte-digital
 ```
 
-### 2. Instale as dependências
+2. **Crie ambiente virtual**
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+
+3. **Instale dependências**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure o banco de dados
-
-Edite o arquivo `.env` com suas credenciais MySQL:
-```env
-DATABASE_URL=root@localhost:3306@sua_senha@cortedigital
+4. **Configure variáveis de ambiente**
+```bash
+cp .env.example .env
+# Edite .env com suas configurações
 ```
 
-### 4. Execute o setup do banco de dados
+5. **Inicialize o banco de dados**
 ```bash
-python setup_database.py
+flask init-db
 ```
 
-### 5. (Opcional) Insira dados de teste
+6. **Execute a aplicação**
 ```bash
-python seed_leo_pablo.py
-```
-
----
-
-## ▶️ Executar o Sistema
-
-```bash
-python app.py
+python run.py
 ```
 
 Acesse: http://localhost:5001
 
----
+## 📚 API Documentation
 
-## 👥 Contas de Teste
+### Autenticação
 
-Após executar `seed_leo_pablo.py`:
+#### POST /api/v1/auth/login
+Login de usuário
 
-**Cliente:**
-- Email: leoguesa08@gmail.com
-- Senha: (definida no cadastro)
-
-**Barbeiro:**
-- Email: pablo@gmail.com
-- Senha: (definida no cadastro)
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-corte-digital/
-├── app.py                  # Aplicação principal Flask
-├── db.py                   # Modelos do banco de dados
-├── services.py             # Lógica de negócio
-├── requirements.txt        # Dependências Python
-├── .env                    # Configurações (não versionado)
-├── corte_digital.db        # Banco de dados SQLite (dev)
-├── setup_database.py       # Setup inicial do banco
-├── reset_database.py       # Reset do banco de dados
-├── seed_leo_pablo.py       # Script de dados de teste
-├── routes/                 # Rotas da API
-│   ├── __init__.py
-│   ├── auth.py            # Autenticação
-│   ├── appointments.py    # Agendamentos
-│   ├── info.py            # Informações
-│   ├── pages.py           # Páginas
-│   └── barber_prices.py   # Preços do barbeiro
-├── static/                 # Arquivos estáticos
-│   ├── css/               # Estilos CSS
-│   └── js/                # JavaScript
-├── templates/              # Templates HTML
-│   ├── index.html
-│   ├── cliente_dashboard.html
-│   └── barbeiro_dashboard.html
-└── scripts/                # Scripts auxiliares
-    ├── migrate_database.py
-    ├── seed_database.py
-    └── verificar_sistema.py
+```json
+{
+  "email": "user@example.com",
+  "password": "senha123"
+}
 ```
 
----
+#### POST /api/v1/auth/register
+Registro de novo usuário
 
-## 🎯 Serviços Disponíveis
+```json
+{
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "phone": "(11) 98765-4321",
+  "password": "Senha@123"
+}
+```
 
-| Serviço | Duração | Preço Base |
-|---------|---------|------------|
-| Corte | 30 min | R$ 35,00 |
-| Barba | 20 min | R$ 25,00 |
-| Corte + Barba | 60 min | R$ 55,00 |
+### Agendamentos
 
-*Barbeiros podem personalizar seus preços*
+#### GET /api/v1/appointments
+Lista agendamentos do usuário
 
----
+#### POST /api/v1/appointments
+Cria novo agendamento
 
-## 🔄 Fluxo de Agendamento
+```json
+{
+  "barberId": 1,
+  "serviceId": 2,
+  "date": "2025-12-15",
+  "time": "14:00"
+}
+```
 
-1. **Cliente agenda** → Status: `pendente`
-2. **Barbeiro confirma** → Status: `agendado`
-3. **Horário + duração passa** → Status: `concluído` (automático)
+### IA & Recomendações
 
----
+#### GET /api/v1/ai/patterns
+Análise de padrões do usuário
 
-## 🛠️ Tecnologias Utilizadas
+#### GET /api/v1/ai/suggest-appointment
+Sugestões de próximos agendamentos
 
-- **Backend:** Flask (Python)
-- **Banco de Dados:** MySQL / SQLite
-- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
-- **ORM:** SQLAlchemy
-- **Autenticação:** Flask Sessions
+#### GET /api/v1/ai/insights
+Insights personalizados
 
----
+## 🧪 Testes
 
-## 📊 Funcionalidades Avançadas
-
-### Auto-Conclusão de Agendamentos
-- Sistema verifica automaticamente agendamentos passados
-- Considera a duração do serviço
-- Marca como concluído após término do serviço
-
-### Validação Inteligente
-- Previne agendamentos em horários passados
-- Detecta conflitos de horário
-- Valida disponibilidade do barbeiro
-
-### Dashboard Profissional
-- Métricas em tempo real
-- Gráfico semanal de faturamento
-- Próximos agendamentos
-- Top serviços realizados
-
----
-
-## 🧪 Scripts Úteis
-
-### Setup Inicial
 ```bash
-python setup_database.py
+# Executar todos os testes
+pytest
+
+# Com coverage
+pytest --cov=app tests/
+
+# Testes específicos
+pytest tests/test_api/
 ```
 
-### Reset do Banco
+## 🐳 Docker
+
 ```bash
-python reset_database.py
+# Build
+docker build -t corte-digital .
+
+# Run
+docker-compose up
 ```
 
-### Dados de Teste
+## 📊 Monitoramento
+
+### Logs
 ```bash
-python seed_leo_pablo.py
+tail -f logs/app.log
 ```
 
-### Organizar Projeto
+### Health Check
+```
+GET /health
+```
+
+## 🔧 Configuração
+
+### Ambientes
+
+- **Development**: Desenvolvimento local
+- **Staging**: Testes pré-produção
+- **Production**: Produção
+
+Configure via variável `FLASK_ENV`:
+
 ```bash
-python organizar_projeto.py
+export FLASK_ENV=production
 ```
 
----
+### Variáveis de Ambiente
 
-## 📝 Notas
+```env
+# App
+SECRET_KEY=sua_chave_secreta
+FLASK_ENV=development
 
-- O sistema usa auto-conclusão baseada na duração do serviço
-- Barbeiros não podem cancelar agendamentos passados
-- Relatórios incluem agendamentos futuros (projeção)
-- Interface responsiva e moderna
+# Database
+DATABASE_PATH=corte_digital.db
 
----
+# Email
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=seu_email@gmail.com
+MAIL_PASSWORD=sua_senha
+
+# Redis (opcional)
+REDIS_URL=redis://localhost:6379/0
+```
 
 ## 🤝 Contribuindo
 
 1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
+2. Crie uma branch (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
----
+## 📝 Changelog
+
+### v2.0.0 (2025-12-03)
+- ✨ Arquitetura completamente refatorada
+- ✨ API REST v1 com versionamento
+- ✨ Sistema de IA para recomendações
+- ✨ Validações avançadas
+- ✨ Cache integrado
+- ✨ Logging estruturado
+- ✨ Testes automatizados
+- ✨ Docker support
+
+### v1.0.0 (2025-11-01)
+- 🎉 Versão inicial
 
 ## 📄 Licença
 
-Este projeto é privado e proprietário.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👥 Equipe
+
+- **Desenvolvimento** - Corte Digital Team
+- **Design** - UI/UX Team
+- **IA** - ML Team
+
+## 🙏 Agradecimentos
+
+- Flask Community
+- Contributors
+- Beta Testers
 
 ---
 
-## 👨‍💻 Desenvolvedor
+**Desenvolvido com ❤️ para revolucionar o agendamento em barbearias**
 
-Sistema desenvolvido para gerenciamento de barbearias.
-
----
-
-## 🆘 Suporte
-
-Para dúvidas ou problemas:
-1. Verifique a documentação
-2. Execute `python verificar_sistema.py`
-3. Consulte os logs do sistema
+[Website](https://cortedigital.com) • [Documentação](https://docs.cortedigital.com) • [Suporte](mailto:suporte@cortedigital.com)

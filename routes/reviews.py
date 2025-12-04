@@ -2,8 +2,8 @@
 Rotas de Avaliações e Reviews
 """
 from flask import Blueprint, jsonify, request, session
-from services import review_service
-from services.notification_service import notify_new_review
+from app.services import review_service
+from app.services.notification_service import notify_new_review
 from routes.notifications import send_realtime_notification
 
 reviews_bp = Blueprint('reviews', __name__)
