@@ -13,6 +13,7 @@ from routes.chat import register_chat_routes, register_socketio_events
 from routes.notifications import register_notifications_routes, register_notification_events
 from routes.analytics import register_analytics_routes
 from routes.reviews import register_reviews_routes
+from routes.ai_recommendations import ai_bp
 import services
 from services import chat_service, notification_service, analytics_service, review_service
 
@@ -59,6 +60,8 @@ register_chat_routes(app)
 register_notifications_routes(app)
 register_analytics_routes(app)
 register_reviews_routes(app, socketio)
+app.register_blueprint(ai_bp)
+print("🤖 Rotas de IA registradas")
 
 # Registra eventos WebSocket
 print("⚡ Registrando eventos WebSocket...")
