@@ -3,7 +3,7 @@ Rotas do sistema de chat
 """
 from flask import Blueprint, request, jsonify, session
 from flask_socketio import emit, join_room, leave_room
-from app.services import chat_service
+from services import chat_service
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -21,31 +21,19 @@ def get_available_users():
         return jsonify({'success': False, 'message': 'Não autenticado'}), 401
     
     try:
-        from app.core.database import get_db
-        conn = get_db()
-        cursor = conn.cursor()
+        from db import Barber, Cliente
         
         user_tipo = session.get('tipo', 'cliente')
         
         # Se é cliente, lista barbeiros. Se é barbeiro, lista clientes
         if user_tipo == 'cliente':
-            cursor.execute("""
-                SELECT id, nome, email FROM barbers
-                ORDER BY nome
-            """)
+            users = Barber.query.order_by(Barber.nome).all()
         else:
-            cursor.execute("""
-                SELECT id, nome, email FROM clientes
-                ORDER BY nome
-            """)
-        
-        users = cursor.fetchall()
-        cursor.close()
-        conn.close()
+            users = Cliente.query.order_by(Cliente.nome).all()
         
         return jsonify({
             'success': True,
-            'users': users
+            'users': [{'id': u.id, 'nome': u.nome, 'email': u.email} for u in users]
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -262,32 +250,20 @@ def get_users_by_type(user_type):
         return jsonify({'success': False, 'message': 'Não autenticado'}), 401
     
     try:
-        from app.core.database import get_db
-        conn = get_db()
-        cursor = conn.cursor()
+        from db import Barber, Cliente
         
         current_user_id = session['user_id']
         
         if user_type == 'barbeiro':
-            cursor.execute("""
-                SELECT id, nome, email FROM barbers
-                WHERE id != %s
-                ORDER BY nome
-            """, (current_user_id if session.get('tipo') == 'barbeiro' else 0,))
+            exclude_id = current_user_id if session.get('tipo') == 'barbeiro' else 0
+            users = Barber.query.filter(Barber.id != exclude_id).order_by(Barber.nome).all()
         else:
-            cursor.execute("""
-                SELECT id, nome, email FROM clientes
-                WHERE id != %s
-                ORDER BY nome
-            """, (current_user_id if session.get('tipo') == 'cliente' else 0,))
-        
-        users = cursor.fetchall()
-        cursor.close()
-        conn.close()
+            exclude_id = current_user_id if session.get('tipo') == 'cliente' else 0
+            users = Cliente.query.filter(Cliente.id != exclude_id).order_by(Cliente.nome).all()
         
         return jsonify({
             'success': True,
-            'users': users
+            'users': [{'id': u.id, 'nome': u.nome, 'email': u.email} for u in users]
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500

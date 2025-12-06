@@ -157,4 +157,53 @@ class BarberPrice(db.Model):
             "barbeiro_id": self.barbeiro_id,
             "servico_nome": self.servico_nome,
             "preco": self.preco
+        }
+
+
+class ChatConversation(db.Model):
+    """Conversas de chat entre cliente e barbeiro"""
+    __tablename__ = "chat_conversations"
+    id = db.Column(db.Integer, primary_key=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id', ondelete='CASCADE'), nullable=False)
+    barbeiro_id = db.Column(db.Integer, db.ForeignKey('barbers.id', ondelete='CASCADE'), nullable=False)
+    last_message_at = db.Column(db.DateTime, default=datetime.utcnow)
+    cliente_unread = db.Column(db.Integer, default=0)
+    barbeiro_unread = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('cliente_id', 'barbeiro_id', name='unique_conversation'),)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "cliente_id": self.cliente_id,
+            "barbeiro_id": self.barbeiro_id,
+            "last_message_at": self.last_message_at.isoformat() if self.last_message_at else None,
+            "cliente_unread": self.cliente_unread,
+            "barbeiro_unread": self.barbeiro_unread,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class ChatMessage(db.Model):
+    """Mensagens de chat"""
+    __tablename__ = "chat_messages"
+    id = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey('chat_conversations.id', ondelete='CASCADE'), nullable=False)
+    sender_id = db.Column(db.Integer, nullable=False)
+    sender_type = db.Column(db.String(20), nullable=False)  # 'cliente' ou 'barbeiro'
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "conversation_id": self.conversation_id,
+            "sender_id": self.sender_id,
+            "sender_type": self.sender_type,
+            "sender_tipo": self.sender_type,  # Alias para compatibilidade
+            "message": self.message,
+            "is_read": self.is_read,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         } 

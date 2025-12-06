@@ -1,15 +1,2 @@
 {
-    "files.associations": {
-        "*.html": "jinja-html",
-        "templates/*.js": "jinja"
-    },
-    "javascript.validate.enable": false,
-    "typescript.validate.enable": false,
-    "[jinja-html]": {
-        "editor.quickSuggestions": {
-            "other": true,
-            "comments": false,
-            "strings": true
-        }
-    }
 }

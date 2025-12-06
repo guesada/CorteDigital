@@ -2,88 +2,41 @@
 Serviço de chat em tempo real entre barbeiro e cliente
 """
 from datetime import datetime
-from database_config import get_database_connection
+from db import db, ChatConversation, ChatMessage, Cliente, Barber
+from sqlalchemy import or_, and_
 
 
 def create_chat_tables():
     """Cria as tabelas necessárias para o sistema de chat"""
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    
     try:
-        # Tabela de conversas (threads)
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS chat_conversations (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                cliente_id INT NOT NULL,
-                barbeiro_id INT NOT NULL,
-                last_message_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                cliente_unread INT DEFAULT 0,
-                barbeiro_unread INT DEFAULT 0,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
-                FOREIGN KEY (barbeiro_id) REFERENCES barbers(id) ON DELETE CASCADE,
-                UNIQUE KEY unique_conversation (cliente_id, barbeiro_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        """)
-        
-        # Tabela de mensagens
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS chat_messages (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                conversation_id INT NOT NULL,
-                sender_id INT NOT NULL,
-                sender_type ENUM('cliente', 'barbeiro') NOT NULL,
-                message TEXT NOT NULL,
-                is_read BOOLEAN DEFAULT FALSE,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
-                INDEX idx_conversation (conversation_id),
-                INDEX idx_created (created_at)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        """)
-        
-        conn.commit()
+        # As tabelas são criadas automaticamente pelo SQLAlchemy
+        db.create_all()
         print("✅ Tabelas de chat criadas com sucesso!")
-        
     except Exception as e:
-        conn.rollback()
         print(f"❌ Erro ao criar tabelas de chat: {e}")
         raise
-    finally:
-        cursor.close()
-        conn.close()
 
 
 def get_or_create_conversation(cliente_id, barbeiro_id):
     """Obtém ou cria uma conversa entre cliente e barbeiro"""
-    conn = get_database_connection()
-    cursor = conn.cursor()
+    # Verifica se já existe conversa
+    conversation = ChatConversation.query.filter_by(
+        cliente_id=cliente_id,
+        barbeiro_id=barbeiro_id
+    ).first()
     
-    try:
-        # Verifica se já existe conversa
-        cursor.execute("""
-            SELECT id FROM chat_conversations 
-            WHERE cliente_id = %s AND barbeiro_id = %s
-        """, (cliente_id, barbeiro_id))
-        
-        result = cursor.fetchone()
-        
-        if result:
-            return result['id']
-        
-        # Cria nova conversa
-        cursor.execute("""
-            INSERT INTO chat_conversations (cliente_id, barbeiro_id)
-            VALUES (%s, %s)
-        """, (cliente_id, barbeiro_id))
-        
-        conn.commit()
-        return cursor.lastrowid
-        
-    finally:
-        cursor.close()
-        conn.close()
+    if conversation:
+        return conversation.id
+    
+    # Cria nova conversa
+    conversation = ChatConversation(
+        cliente_id=cliente_id,
+        barbeiro_id=barbeiro_id
+    )
+    db.session.add(conversation)
+    db.session.commit()
+    
+    return conversation.id
 
 
 def send_message(conversation_id, sender_id, sender_type, message):
@@ -94,230 +47,134 @@ def send_message(conversation_id, sender_id, sender_type, message):
     print(f"   sender_type={sender_type}")
     print(f"   message={message}")
     
-    conn = get_database_connection()
-    cursor = conn.cursor()
+    # Cria a mensagem
+    chat_message = ChatMessage(
+        conversation_id=conversation_id,
+        sender_id=sender_id,
+        sender_type=sender_type,
+        message=message
+    )
+    db.session.add(chat_message)
+    db.session.flush()  # Para obter o ID
     
-    try:
-        # Insere a mensagem
-        cursor.execute("""
-            INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message)
-            VALUES (%s, %s, %s, %s)
-        """, (conversation_id, sender_id, sender_type, message))
-        
-        print(f"✅ Mensagem inserida no banco, ID: {cursor.lastrowid}")
-        
-        message_id = cursor.lastrowid
-        
-        # Atualiza a conversa
-        cursor.execute("""
-            SELECT cliente_id, barbeiro_id FROM chat_conversations
-            WHERE id = %s
-        """, (conversation_id,))
-        
-        conv = cursor.fetchone()
-        
-        # Incrementa contador de não lidas para o destinatário
-        if sender_type == 'cliente':
-            cursor.execute("""
-                UPDATE chat_conversations 
-                SET barbeiro_unread = barbeiro_unread + 1,
-                    last_message_at = NOW()
-                WHERE id = %s
-            """, (conversation_id,))
-        else:
-            cursor.execute("""
-                UPDATE chat_conversations 
-                SET cliente_unread = cliente_unread + 1,
-                    last_message_at = NOW()
-                WHERE id = %s
-            """, (conversation_id,))
-        
-        conn.commit()
-        
-        # Retorna a mensagem criada com nome do remetente
-        if sender_type == 'cliente':
-            cursor.execute("""
-                SELECT m.*, c.nome as sender_nome, m.sender_type as sender_tipo
-                FROM chat_messages m
-                JOIN clientes c ON m.sender_id = c.id
-                WHERE m.id = %s
-            """, (message_id,))
-        else:
-            cursor.execute("""
-                SELECT m.*, b.nome as sender_nome, m.sender_type as sender_tipo
-                FROM chat_messages m
-                JOIN barbers b ON m.sender_id = b.id
-                WHERE m.id = %s
-            """, (message_id,))
-        
-        result = cursor.fetchone()
-        
-        # Converte datetime para string
-        if result and result.get('created_at'):
-            result['created_at'] = result['created_at'].isoformat()
-        
-        return result
-        
-    finally:
-        cursor.close()
-        conn.close()
+    print(f"✅ Mensagem inserida no banco, ID: {chat_message.id}")
+    
+    # Atualiza a conversa
+    conversation = ChatConversation.query.get(conversation_id)
+    conversation.last_message_at = datetime.utcnow()
+    
+    # Incrementa contador de não lidas para o destinatário
+    if sender_type == 'cliente':
+        conversation.barbeiro_unread += 1
+    else:
+        conversation.cliente_unread += 1
+    
+    db.session.commit()
+    
+    # Busca o nome do remetente
+    if sender_type == 'cliente':
+        sender = Cliente.query.get(sender_id)
+    else:
+        sender = Barber.query.get(sender_id)
+    
+    result = chat_message.to_dict()
+    result['sender_nome'] = sender.nome if sender else 'Desconhecido'
+    
+    return result
 
 
 def get_messages(conversation_id, limit=50):
     """Obtém mensagens de uma conversa"""
-    conn = get_database_connection()
-    cursor = conn.cursor()
+    messages = ChatMessage.query.filter_by(
+        conversation_id=conversation_id
+    ).order_by(ChatMessage.created_at.asc()).limit(limit).all()
     
-    try:
-        cursor.execute("""
-            SELECT 
-                m.*,
-                CASE 
-                    WHEN m.sender_type = 'cliente' THEN c.nome
-                    ELSE b.nome
-                END as sender_nome
-            FROM chat_messages m
-            LEFT JOIN clientes c ON m.sender_id = c.id AND m.sender_type = 'cliente'
-            LEFT JOIN barbers b ON m.sender_id = b.id AND m.sender_type = 'barbeiro'
-            WHERE m.conversation_id = %s
-            ORDER BY m.created_at DESC
-            LIMIT %s
-        """, (conversation_id, limit))
+    result = []
+    for msg in messages:
+        msg_dict = msg.to_dict()
         
-        messages = cursor.fetchall()
+        # Busca o nome do remetente
+        if msg.sender_type == 'cliente':
+            sender = Cliente.query.get(msg.sender_id)
+        else:
+            sender = Barber.query.get(msg.sender_id)
         
-        # Converte datetime para string
-        for msg in messages:
-            if msg['created_at']:
-                msg['created_at'] = msg['created_at'].isoformat()
-            # Renomeia sender_type para sender_tipo
-            msg['sender_tipo'] = msg.get('sender_type', 'cliente')
-        
-        return list(reversed(messages))
-        
-    finally:
-        cursor.close()
-        conn.close()
+        msg_dict['sender_nome'] = sender.nome if sender else 'Desconhecido'
+        result.append(msg_dict)
+    
+    return result
 
 
 def mark_as_read(conversation_id, user_id):
     """Marca mensagens como lidas"""
-    conn = get_database_connection()
-    cursor = conn.cursor()
+    # Marca mensagens como lidas
+    ChatMessage.query.filter(
+        ChatMessage.conversation_id == conversation_id,
+        ChatMessage.sender_id != user_id,
+        ChatMessage.is_read == False
+    ).update({ChatMessage.is_read: True})
     
-    try:
-        # Marca mensagens como lidas
-        cursor.execute("""
-            UPDATE chat_messages 
-            SET is_read = TRUE
-            WHERE conversation_id = %s 
-            AND sender_id != %s
-            AND is_read = FALSE
-        """, (conversation_id, user_id))
-        
-        # Reseta contador de não lidas
-        cursor.execute("""
-            SELECT cliente_id, barbeiro_id FROM chat_conversations
-            WHERE id = %s
-        """, (conversation_id,))
-        
-        conv = cursor.fetchone()
-        
-        if conv['cliente_id'] == user_id:
-            cursor.execute("""
-                UPDATE chat_conversations 
-                SET cliente_unread = 0
-                WHERE id = %s
-            """, (conversation_id,))
-        else:
-            cursor.execute("""
-                UPDATE chat_conversations 
-                SET barbeiro_unread = 0
-                WHERE id = %s
-            """, (conversation_id,))
-        
-        conn.commit()
-        
-    finally:
-        cursor.close()
-        conn.close()
+    # Reseta contador de não lidas
+    conversation = ChatConversation.query.get(conversation_id)
+    
+    if conversation.cliente_id == user_id:
+        conversation.cliente_unread = 0
+    else:
+        conversation.barbeiro_unread = 0
+    
+    db.session.commit()
 
 
 def get_user_conversations(user_id, user_tipo):
     """Obtém todas as conversas de um usuário"""
-    conn = get_database_connection()
-    cursor = conn.cursor()
+    if user_tipo == 'cliente':
+        conversations = ChatConversation.query.filter_by(
+            cliente_id=user_id
+        ).order_by(ChatConversation.last_message_at.desc()).all()
+    else:
+        conversations = ChatConversation.query.filter_by(
+            barbeiro_id=user_id
+        ).order_by(ChatConversation.last_message_at.desc()).all()
     
-    try:
+    result = []
+    for conv in conversations:
+        # Busca o outro usuário
         if user_tipo == 'cliente':
-            cursor.execute("""
-                SELECT 
-                    c.id,
-                    c.last_message_at,
-                    c.cliente_unread as unread_count,
-                    b.id as other_user_id,
-                    b.nome as other_user_nome,
-                    (SELECT message FROM chat_messages 
-                     WHERE conversation_id = c.id 
-                     ORDER BY created_at DESC LIMIT 1) as last_message
-                FROM chat_conversations c
-                JOIN barbers b ON c.barbeiro_id = b.id
-                WHERE c.cliente_id = %s
-                ORDER BY c.last_message_at DESC
-            """, (user_id,))
+            other_user = Barber.query.get(conv.barbeiro_id)
+            unread_count = conv.cliente_unread
         else:
-            cursor.execute("""
-                SELECT 
-                    c.id,
-                    c.last_message_at,
-                    c.barbeiro_unread as unread_count,
-                    cl.id as other_user_id,
-                    cl.nome as other_user_nome,
-                    (SELECT message FROM chat_messages 
-                     WHERE conversation_id = c.id 
-                     ORDER BY created_at DESC LIMIT 1) as last_message
-                FROM chat_conversations c
-                JOIN clientes cl ON c.cliente_id = cl.id
-                WHERE c.barbeiro_id = %s
-                ORDER BY c.last_message_at DESC
-            """, (user_id,))
+            other_user = Cliente.query.get(conv.cliente_id)
+            unread_count = conv.barbeiro_unread
         
-        conversations = cursor.fetchall()
+        # Busca última mensagem
+        last_msg = ChatMessage.query.filter_by(
+            conversation_id=conv.id
+        ).order_by(ChatMessage.created_at.desc()).first()
         
-        # Converte datetime para string
-        for conv in conversations:
-            if conv['last_message_at']:
-                conv['last_message_at'] = conv['last_message_at'].isoformat()
-        
-        return conversations
-        
-    finally:
-        cursor.close()
-        conn.close()
+        result.append({
+            'id': conv.id,
+            'last_message_at': conv.last_message_at.isoformat() if conv.last_message_at else None,
+            'unread_count': unread_count,
+            'other_user_id': other_user.id if other_user else None,
+            'other_user_nome': other_user.nome if other_user else 'Desconhecido',
+            'last_message': last_msg.message if last_msg else None
+        })
+    
+    return result
 
 
 def get_total_unread(user_id, user_tipo):
     """Obtém total de mensagens não lidas"""
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    
-    try:
-        if user_tipo == 'cliente':
-            cursor.execute("""
-                SELECT COALESCE(SUM(cliente_unread), 0) as total
-                FROM chat_conversations
-                WHERE cliente_id = %s
-            """, (user_id,))
-        else:
-            cursor.execute("""
-                SELECT COALESCE(SUM(barbeiro_unread), 0) as total
-                FROM chat_conversations
-                WHERE barbeiro_id = %s
-            """, (user_id,))
-        
-        result = cursor.fetchone()
-        return result['total']
-        
-    finally:
-        cursor.close()
-        conn.close()
+    if user_tipo == 'cliente':
+        conversations = ChatConversation.query.filter_by(cliente_id=user_id).all()
+        return sum(conv.cliente_unread for conv in conversations)
+    else:
+        conversations = ChatConversation.query.filter_by(barbeiro_id=user_id).all()
+        return sum(conv.barbeiro_unread for conv in conversations)
+
+
+# Função auxiliar para compatibilidade com código antigo
+def get_database_connection():
+    """Retorna conexão do banco (para compatibilidade)"""
+    from database_config import get_database_connection as get_conn
+    return get_conn()
